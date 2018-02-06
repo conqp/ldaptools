@@ -27,7 +27,7 @@ from tempfile import NamedTemporaryFile
 
 SLAPPASSWD = '/usr/bin/slappasswd'
 LDAPADD = '/usr/bin/ldapadd'
-BASH = '/usr/bin/bash'
+BASH = '/bin/bash'
 
 
 class InvalidName(ValueError):
