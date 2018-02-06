@@ -19,6 +19,7 @@
 """Tools to manage LDAP users."""
 
 from os import linesep
+from subprocess import check_output
 
 
 SLAPPASSWD = '/usr/bin/slappasswd'
