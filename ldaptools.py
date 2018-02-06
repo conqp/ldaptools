@@ -104,6 +104,16 @@ class LDIF(dict):
         """Returns the LDIF file as a string."""
         return linesep.join(self.lines)
 
+    def __setitem__(self, key, value):
+        """Sets the key to the respective value.
+        If value is None, deletes the respective key.
+        """
+        if value is None:
+            with suppress(KeyError):
+                del self[key]
+        else:
+            super().__setitem__(key, value)
+
     @property
     def entries(self):
         """Yields all entries."""
@@ -122,16 +132,6 @@ class LDIF(dict):
         """Yields LDIF file lines."""
         for option, value in self.entries:
             yield '{}: {}'.format(option, value)
-
-    def __setitem__(self, key, value):
-        """Sets the key to the respective value.
-        If value is None, deletes the respective key.
-        """
-        if value is None:
-            with suppress(KeyError):
-                del self[key]
-        else:
-            super().__setitem__(key, value)
 
 
 class LDIFUser(LDIF):
