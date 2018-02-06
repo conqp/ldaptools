@@ -74,53 +74,6 @@ def get_gid():
     raise NotImplementedError()
 
 
-def create_user(login_name, admin, organizational_unit, *domain_components,
-                passwd=None, uid=None, gid=None, shell=BASH, home=None,
-                name=None, title=None, phone=None, mobile=None):
-    """Creates a new user."""
-
-    admin = DistinguishedName(admin, organizational_unit, *domain_components)
-    user = LDIFUser(login_name, organizational_unit, *domain_components)
-
-    if passwd is None:
-        passwd = genpw()
-
-    user.passwd = passwd
-
-    if uid is None:
-        uid = get_uid()
-
-    user.uid = uid
-
-    if gid is None:
-        gid = get_gid()
-
-    user.gid = gid
-    user.shell = shell
-
-    if home is None:
-        home = '/home/{}'.format(login_name)
-
-    user.home = home
-
-    if name is not None:
-        user.name = name
-
-    if title is not None:
-        user.title = title
-
-    if phone is not None:
-        user.phone = phone
-
-    if mobile is not None:
-        user.mobile = mobile
-
-    with NamedTemporaryFile(suffix='.ldif') as ldif:
-        ldif.write(str(user))
-        ldif.flush()
-        return ldapadd(admin, ldif.name).check_returncode()
-
-
 class DistinguishedName:
     """Represents a distinguished name."""
 
@@ -371,3 +324,52 @@ class LDIFUser(LDIF):
         self.common_name = name
         self.surname = surname
         self.given_name = given_name
+
+
+class LDAPAdmin(DistinguishedName):
+    """Represents an LDAP admin."""
+
+    def useradd(self, login_name, passwd, uid=None, gid=None, shell=BASH,
+                home=None, name=None, title=None, phone=None, mobile=None):
+        """Creates a new user."""
+
+        user = LDIFUser(login_name, self.organizational_unit,
+                        *self.domain_components)
+
+        if passwd is None:
+            passwd = genpw()
+
+        user.passwd = passwd
+
+        if uid is None:
+            uid = get_uid()
+
+        user.uid = uid
+
+        if gid is None:
+            gid = get_gid()
+
+        user.gid = gid
+        user.shell = shell
+
+        if home is None:
+            home = '/home/{}'.format(login_name)
+
+        user.home = home
+
+        if name is not None:
+            user.name = name
+
+        if title is not None:
+            user.title = title
+
+        if phone is not None:
+            user.phone = phone
+
+        if mobile is not None:
+            user.mobile = mobile
+
+        with NamedTemporaryFile(suffix='.ldif') as ldif:
+            ldif.write(str(user))
+            ldif.flush()
+            return ldapadd(admin, ldif.name).check_returncode()
