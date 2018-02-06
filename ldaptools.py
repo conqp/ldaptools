@@ -58,7 +58,7 @@ class DistinguishedName:
 
     def __str__(self):
         """Returns a string representation of the distinguished name."""
-        return ','.join(self)
+        return ','.join('{}={}'.format(key, value) for key, value in self)
 
 
 class LDIF(dict):
