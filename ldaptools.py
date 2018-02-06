@@ -74,7 +74,7 @@ def get_gid():
     raise NotImplementedError()
 
 
-def create_user(username, admin, organizational_unit, *domain_components,
+def create_user(login_name, admin, organizational_unit, *domain_components,
                 passwd=None, uid=None, gid=None, shell=BASH, home=None,
                 name=None, title=None, phone=None, mobile=None):
     """Creates a new user."""
