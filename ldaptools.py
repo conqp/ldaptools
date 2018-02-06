@@ -19,10 +19,15 @@
 """Tools to manage LDAP users."""
 
 from os import linesep
-from subprocess import check_output
+from random import choice
+from string import ascii_letters, digits, punctuation
+from subprocess import DEVNULL, check_output, run
+from tempfile import NamedTemporaryFile
 
 
 SLAPPASSWD = '/usr/bin/slappasswd'
+LDAPADD = '/usr/bin/ldapadd'
+BASH = '/usr/bin/bash'
 
 
 class InvalidName(ValueError):
@@ -42,6 +47,78 @@ def slappasswd(passwd):
     """Hashes a plain text password for LDIF."""
 
     return check_output((SLAPPASSWD, '-s', passwd)).decode()
+
+
+def ldapadd(common_name, ldif):
+    """Adds the respective LDIF file."""
+
+    return run((LDAPADD, '-D', str(common_name), '-W', '-f', ldif),
+               stdout=DEVNULL, stderr=DEVNULL)
+
+
+def genpw(pool=ascii_letters+digits+punctuation, length=8):
+    """Generates a unique random password."""
+
+    return ''.join(choice(pool) for _ in range(length))
+
+
+def get_uid():
+    """Returns a unique, unassigned user ID."""
+
+    raise NotImplementedError()
+
+
+def get_gid():
+    """Returns a unique, unassigned group ID."""
+
+    raise NotImplementedError()
+
+
+def create_user(username, admin, organizational_unit, *domain_components,
+                passwd=None, uid=None, gid=None, shell=BASH, home=None,
+                name=None, title=None, phone=None, mobile=None):
+    """Creates a new user."""
+
+    admin = DistinguishedName(admin, organizational_unit, *domain_components)
+    user = LDIFUser(login_name, organizational_unit, *domain_components)
+
+    if passwd is None:
+        passwd = genpw()
+
+    user.passwd = passwd
+
+    if uid is None:
+        uid = get_uid()
+
+    user.uid = uid
+
+    if gid is None:
+        gid = get_gid()
+
+    user.gid = gid
+    user.shell = shell
+
+    if home is None:
+        home = '/home/{}'.format(login_name)
+
+    user.home = home
+
+    if name is not None:
+        user.name = name
+
+    if title is not None:
+        user.title = title
+
+    if phone is not None:
+        user.phone = phone
+
+    if mobile is not None:
+        user.mobile = mobile
+
+    with NamedTemporaryFile(suffix='.ldif') as ldif:
+        ldif.write(str(user))
+        ldif.flush()
+        return ldapadd(admin, ldif.name).check_returncode()
 
 
 class DistinguishedName:
@@ -77,6 +154,9 @@ class LDIF(dict):
     def entries(self):
         """Yields all entries."""
         for key, value in self.items():
+            if value is None:
+                continue
+
             if isinstance(value, (tuple, list)):
                 for item in value:
                     yield (key, item)
