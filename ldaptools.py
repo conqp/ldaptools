@@ -372,4 +372,4 @@ class LDAPAdmin(DistinguishedName):
         with NamedTemporaryFile(suffix='.ldif') as ldif:
             ldif.write(str(user))
             ldif.flush()
-            return ldapadd(admin, ldif.name).check_returncode()
+            return ldapadd(self, ldif.name).check_returncode()
