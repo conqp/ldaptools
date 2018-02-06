@@ -33,7 +33,7 @@ class InvalidName(ValueError):
         self.name = name
 
 
-def ldap_hash(passwd):
+def slappasswd(passwd):
     """Hashes a plain text password for LDIF."""
 
     return check_output((SLAPPASSWD, '-s', passwd)).decode()
@@ -95,6 +95,9 @@ class LDIFUser(LDIF):
         super().__init__(kwargs)
         self.distinguished_name = DistinguishedName(
             uid, organizational_unit, *domain_components)
+        self.object_classes = [
+            'top', 'person', 'organizationalPerson', 'inetOrgPerson',
+            'posixAccount', 'shadowAccount']
 
     @property
     def distinguished_name(self):
@@ -106,6 +109,16 @@ class LDIFUser(LDIF):
         """Sets the distinguished name."""
         self['dn'] = distinguished_name
         self.user_name = distinguished_name.uid
+
+    @property
+    def object_classes(self):
+        """Returns the configured object classes."""
+        return self.get('objectClass', ())
+
+    @object_classes.setter
+    def object_classes(self, object_classes):
+        """Sets the object classes."""
+        self['objectClass'] = object_classes
 
     @property
     def user_name(self):
@@ -195,7 +208,7 @@ class LDIFUser(LDIF):
     @passwd.setter
     def passwd(self, passwd):
         """Sets the users password."""
-        self['userPassword'] = ldap_hash(passwd)
+        self['userPassword'] = slappasswd(passwd)
 
     @property
     def website(self):
