@@ -126,11 +126,11 @@ class LDIF(dict):
 class LDIFUser(LDIF):
     """An LDIF user file."""
 
-    def __init__(self, uid, organizational_unit, *domain_components, **kwargs):
+    def __init__(self, uid, organizational_unit, *domain_components):
         """Sets user ID, organizational unit, domain
         components and optional arguments.
         """
-        super().__init__(kwargs)
+        super().__init__()
         self.distinguished_name = DistinguishedName(
             uid, organizational_unit, *domain_components)
         self.object_classes = [
