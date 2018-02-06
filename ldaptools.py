@@ -33,6 +33,10 @@ class InvalidName(ValueError):
         super().__init__(name)
         self.name = name
 
+    def __str__(self):
+        """Returns the error message."""
+        return 'Invalid name: "{}".'.format(self.name)
+
 
 def slappasswd(passwd):
     """Hashes a plain text password for LDIF."""
