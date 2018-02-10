@@ -129,16 +129,24 @@ Options:
 class DistinguishedName:
     """Represents a distinguished name."""
 
-    def __init__(self, uid, organizational_unit, *domain_components):
+    def __init__(self, *domain_components, common_name=None, uid=None,
+                 organizational_unit=None):
         """Sets the respective components."""
+        self.domain_components = domain_components
+        self.common_name = common_name
         self.uid = uid
         self.organizational_unit = organizational_unit
-        self.domain_components = domain_components
 
     def __iter__(self):
         """Yields the respective entries."""
-        yield ('uid', self.uid)
-        yield ('ou', self.organizational_unit)
+        if self.common_name is not None:
+            yield ('cn', self.common_name)
+
+        if self.uid is not None:
+            yield ('uid', self.uid)
+
+        if self.organizational_unit is not None:
+            yield ('ou', self.organizational_unit)
 
         for domain_component in self.domain_components:
             yield ('dc', domain_component)
@@ -150,6 +158,7 @@ class DistinguishedName:
     @classmethod
     def from_string(cls, string):
         """Creates a distinguished name from the provided string."""
+        common_name = None
         uid = None
         organizational_unit = None
         domain_components = []
@@ -157,7 +166,12 @@ class DistinguishedName:
         for field in string.split(','):
             key, value = field.split('=')
 
-            if key == 'uid':
+            if key == 'cn':
+                if common_name is None:
+                    common_name = value
+                else:
+                    raise ValueError('Multiple common names specified.')
+            elif key == 'uid':
                 if uid is None:
                     uid = value
                 else:
@@ -174,12 +188,9 @@ class DistinguishedName:
                 raise ValueError(
                     'Invalid distinguished name component: {}.'.format(key))
 
-        if uid is None:
-            raise ValueError('No UID specified.')
-        elif organizational_unit is None:
-            raise ValueError('No organizational unit specified.')
-
-        return cls(uid, organizational_unit, *domain_components)
+        return cls(
+            *domain_components, common_name=common_name, uid=uid,
+            organizational_unit=organizational_unit)
 
 
 class LDIF(dict):
