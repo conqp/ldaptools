@@ -21,8 +21,9 @@
 from contextlib import suppress
 from os import linesep
 from random import choice
-from string import ascii_letters, digits, punctuation
-from subprocess import DEVNULL, check_output, run
+from string import ascii_letters, digits
+from subprocess import DEVNULL, CalledProcessError, check_output, run
+from sys import exit as exit_, stderr
 from tempfile import NamedTemporaryFile
 
 
@@ -57,7 +58,7 @@ def ldapadd(common_name, ldif):
                stdout=DEVNULL, stderr=DEVNULL)
 
 
-def genpw(pool=ascii_letters+digits+punctuation, length=8):
+def genpw(pool=ascii_letters+digits, length=8):
     """Generates a unique random password."""
 
     return ''.join(choice(pool) for _ in range(length))
@@ -73,6 +74,56 @@ def get_gid():
     """Returns a unique, unassigned group ID."""
 
     raise NotImplementedError()
+
+
+def ldapuseradd(options):
+    """useradd.
+
+    Adds a new user.
+
+Usage:
+    ldapuseradd <dn> <user> [options]
+
+Options:
+    --passwd=<passwd>, -P   Sets the user's password.
+    --uid=<uid>, -u         Sets the user's UID.
+    --gid=<gid>, -g         Sets the user's GID.
+    --shell=<shell>, -s     Sets the user's logn shell.
+    --home=<home>, -d       Sets the user's home directory.
+    --name=<name>, -n       Sets the user's full name.
+    --title=<title>, -t     Sets the user's title.
+    --phone=<phone>, -p     Sets the user's phone number.
+    --mobile=<mobile>, -m   Sets the user's mobile phone number.
+"""
+
+    options = docopt(__doc__)
+    distinguished_name = options['<dn>']
+    user = options['<user>']
+    passwd = options['--passwd'] or genpw()
+    uid = options['--uid'] or get_uid()
+    gid = options['--gid'] or get_gid()
+    shell = options['--shell'] or BASH
+    home = options['--home']
+    name = options['--name']
+    title = options['--title']
+    phone = options['--phone']
+    mobile = options['--mobile']
+
+    try:
+        admin = LDAPAdmin.from_string(distinguished_name)
+    except ValueError as value_error:
+        print(value_error, file=stderr)
+        return 2
+
+    try:
+        admin.useradd(
+            user, passwd, uid=uid, gid=gid, shell=shell, home=home, name=name,
+            title=title, phone=phone, mobile=mobile)
+    except CalledProcessError as called_process_error:
+        print(called_process_error, file=stderr)
+        return 3
+
+    return 0
 
 
 class DistinguishedName:
@@ -95,6 +146,40 @@ class DistinguishedName:
     def __str__(self):
         """Returns a string representation of the distinguished name."""
         return ','.join('{}={}'.format(key, value) for key, value in self)
+
+    @classmethod
+    def from_string(cls, string):
+        """Creates a distinguished name from the provided string."""
+        uid = None
+        organizational_unit = None
+        domain_components = []
+
+        for field in string.split(','):
+            key, value = field.split('=')
+
+            if key == 'uid':
+                if uid is None:
+                    uid = value
+                else:
+                    raise ValueError('Multiple UIDs specified.')
+            elif key == 'ou':
+                if organizational_unit is None:
+                    organizational_unit = value
+                else:
+                    raise ValueError(
+                        'Multiple organizational units specified.')
+            elif key == 'dc':
+                domain_components.append(value)
+            else:
+                raise ValueError(
+                    'Invalid distinguished name component: {}.'.format(key))
+
+        if uid is None:
+            raise ValueError('No UID specified.')
+        elif organizational_unit is None:
+            raise ValueError('No organizational unit specified.')
+
+        return cls(uid, organizational_unit, *domain_components)
 
 
 class LDIF(dict):
@@ -384,3 +469,11 @@ class LDAPAdmin(DistinguishedName):
             ldif.write(str(user))
             ldif.flush()
             return ldapadd(self, ldif.name).check_returncode()
+
+
+if __name__ == '__main__':
+    try:
+        from docopt import docopt
+    except ImportError:
+        print('docopt not installed. CLI not available.', file=stderr)
+        exit_(4)
