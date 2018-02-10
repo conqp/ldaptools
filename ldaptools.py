@@ -95,7 +95,6 @@ Options:
     --mobile=<mobile>, -m   Sets the user's mobile phone number.
 """
 
-    options = docopt(__doc__)
     distinguished_name = options['<dn>']
     user = options['<user>']
     passwd = options['--passwd'] or genpw()
