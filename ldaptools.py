@@ -54,8 +54,7 @@ def slappasswd(passwd):
 def ldapadd(common_name, ldif):
     """Adds the respective LDIF file."""
 
-    return run((LDAPADD, '-D', str(common_name), '-W', '-f', ldif),
-               stdout=DEVNULL, stderr=DEVNULL)
+    return run((LDAPADD, '-D', str(common_name), '-W', '-f', ldif))
 
 
 def genpw(pool=ascii_letters+digits, length=8):
@@ -120,7 +119,7 @@ Options:
             user, passwd, uid=uid, gid=gid, shell=shell, home=home, name=name,
             title=title, phone=phone, mobile=mobile)
     except CalledProcessError as called_process_error:
-        print(called_process_error, file=stderr)
+        print(called_process_error.stderr.decode(), file=stderr)
         return 3
 
     return 0
@@ -239,7 +238,8 @@ class LDIFUser(LDIF):
         """
         super().__init__()
         self.distinguished_name = DistinguishedName(
-            uid, organizational_unit, *domain_components)
+            *domain_components, uid=uid,
+            organizational_unit=organizational_unit)
         self.object_classes = [
             'top', 'person', 'organizationalPerson', 'inetOrgPerson',
             'posixAccount', 'shadowAccount']
@@ -476,7 +476,7 @@ class LDAPAdmin(DistinguishedName):
         if mobile is not None:
             user.mobile = mobile
 
-        with NamedTemporaryFile(suffix='.ldif') as ldif:
+        with NamedTemporaryFile(mode='w', suffix='.ldif') as ldif:
             ldif.write(str(user))
             ldif.flush()
             return ldapadd(self, ldif.name).check_returncode()
