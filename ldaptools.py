@@ -22,7 +22,7 @@ from contextlib import suppress
 from os import linesep
 from random import choice
 from string import ascii_letters, digits
-from subprocess import DEVNULL, CalledProcessError, check_output, run
+from subprocess import CalledProcessError, check_output, run
 from sys import exit as exit_, stderr
 from tempfile import NamedTemporaryFile
 
