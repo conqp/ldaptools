@@ -1,6 +1,6 @@
 #  ldaptools.py.
 #
-#  (C) 2018 Richard Neumann <r dot neumann at homeinfo period de>
+#  (C) 2018 Richard Neumann <mail at richard dash neumann period de>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
