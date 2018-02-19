@@ -507,3 +507,5 @@ if __name__ == '__main__':
     except ImportError:
         print('docopt not installed. CLI not available.', file=stderr)
         exit_(4)
+
+    exit_(ldapuseradd(docopt(__doc__)))
