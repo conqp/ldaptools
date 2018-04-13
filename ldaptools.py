@@ -491,12 +491,7 @@ class LDAPAdmin(DistinguishedName):
         with NamedTemporaryFile(mode='w', suffix='.ldif') as ldif:
             ldif.write(str(user))
             ldif.flush()
-
-            try:
-                return ldapadd(self, ldif.name).check_returncode()
-            except CalledProcessError:
-                print(user, flush=True)
-                raise
+            return ldapadd(self, ldif.name).check_returncode()
 
 
 if __name__ == '__main__':
