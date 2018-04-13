@@ -435,7 +435,7 @@ class LDIFUser(LDIF):
     def name(self, name):
         """Sets the user's name."""
         try:
-            given_name, *_, surname = name
+            given_name, *_, surname = name.split()
         except ValueError:
             raise InvalidName(name)
 
