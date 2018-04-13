@@ -510,4 +510,4 @@ if __name__ == '__main__':
         print('docopt not installed. CLI not available.', file=stderr)
         exit_(4)
 
-    exit_(ldapuseradd(docopt(__doc__)))
+    exit_(ldapuseradd(docopt(ldapuseradd.__doc__)))
