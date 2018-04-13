@@ -119,7 +119,7 @@ Options:
 
     distinguished_name = options['<dn>']
     user = options['<user>']
-    passwd = options['--passwd'] or genpw()
+    passwd = options['--passwd']
     uid = options['--uid'] or get_uid()
     gid = options['--gid'] or get_gid()
     shell = options['--shell'] or BASH
@@ -457,8 +457,6 @@ class LDAPAdmin(DistinguishedName):
         if passwd is None:
             passwd = genpw()
             print('Generated password:', passwd, flush=True)
-        else:
-            print('Debug.', passwd)
 
         user.passwd = passwd
 
