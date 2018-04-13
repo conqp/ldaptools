@@ -456,6 +456,7 @@ class LDAPAdmin(DistinguishedName):
 
         if passwd is None:
             passwd = genpw()
+            print('Generated password:', password, flush=True)
 
         user.passwd = passwd
 
