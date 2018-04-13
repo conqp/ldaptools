@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+#
 #  ldaptools.py.
 #
 #  (C) 2018 Richard Neumann <mail at richard dash neumann period de>
