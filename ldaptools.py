@@ -58,7 +58,7 @@ class IdentifiersExhausted(Exception):
 def slappasswd(passwd):
     """Hashes a plain text password for LDIF."""
 
-    return check_output((SLAPPASSWD, '-s', passwd)).decode()
+    return check_output((SLAPPASSWD, '-s', passwd)).decode().strip()
 
 
 def ldapadd(common_name, ldif):
