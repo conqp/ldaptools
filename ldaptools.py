@@ -128,20 +128,10 @@ Options:
     title = options['--title']
     phone = options['--phone']
     mobile = options['--mobile']
-
-    try:
-        admin = LDAPAdmin.from_string(distinguished_name)
-    except ValueError as value_error:
-        print(value_error, file=stderr)
-        return 2
-
-    try:
-        admin.useradd(
-            user, passwd, uid=uid, gid=gid, shell=shell, home=home, name=name,
-            title=title, phone=phone, mobile=mobile)
-    except CalledProcessError as called_process_error:
-        print(called_process_error.stderr.decode(), file=stderr)
-        return 3
+    admin = LDAPAdmin.from_string(distinguished_name)
+    admin.useradd(
+        user, passwd, uid=uid, gid=gid, shell=shell, home=home, name=name,
+        title=title, phone=phone, mobile=mobile)
 
     return 0
 
