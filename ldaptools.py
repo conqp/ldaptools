@@ -26,7 +26,7 @@ from os import linesep
 from pwd import getpwall
 from random import choice
 from string import ascii_letters, digits
-from subprocess import CalledProcessError, check_output, run
+from subprocess import check_output, run
 from sys import exit as exit_, stderr
 from tempfile import NamedTemporaryFile
 
@@ -85,7 +85,7 @@ def get_uid(min_=1000, max_=65544):
     raise IdentifiersExhausted('UIDs exhausted.')
 
 
-def get_gid(min_=1000, max_=65543):
+def get_gid(min_=1000, max_=65544):
     """Returns a unique, unassigned group ID."""
 
     gids = tuple(group.gr_gid for group in getgrall())
@@ -442,6 +442,33 @@ class LDIFUser(LDIF):
         self.common_name = name
         self.surname = surname
         self.given_name = given_name
+
+
+class LDIFGroup(LDIF):
+    """An LDIF group."""
+
+    def __init__(self, common_name, organizational_unit, *domain_components,
+                 gid=None):
+        """Sets user ID, organizational unit, domain
+        components and optional arguments.
+        """
+        super().__init__()
+        self.distinguished_name = DistinguishedName(
+            *domain_components, common_name=common_name,
+            organizational_unit=organizational_unit)
+        self.gid = gid
+        self.object_classes = ['top', 'posixGroup']
+
+    @property
+    def gid(self):
+        """Returns the group ID."""
+        return self['gidNumber']
+
+    @gid.setter
+    def gid(self, gid):
+        """Sets the group ID."""
+        self['gidNumber'] = gid
+
 
 
 class LDAPAdmin(DistinguishedName):
