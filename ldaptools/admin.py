@@ -2,8 +2,9 @@
 
 from tempfile import NamedTemporaryFile
 
+from ldaptools.constants import BASH
+from ldaptools.functions import get_uid, get_gid, ldapadd
 from ldaptools.ldif import DistinguishedName, LDIFUser
-from ldaptools.misc import BASH, genpw, get_uid, get_gid, ldapadd
 
 __all__ = ['LDAPAdmin']
 

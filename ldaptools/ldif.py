@@ -4,7 +4,7 @@ from contextlib import suppress
 from os import linesep
 
 from ldaptools.exceptions import InvalidName
-from ldaptools.misc import slappasswd
+from ldaptools.functions import slappasswd
 
 __all__ = ['DistinguishedName', 'LDIF', 'LDIFUser', 'LDIFGroup']
 

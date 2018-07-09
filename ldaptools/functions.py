@@ -6,14 +6,10 @@ from random import choice
 from string import ascii_letters, digits
 from subprocess import check_output, run
 
+from ldaptools.constants import LDAPADD, SLAPPASSWD
 from ldaptools.exceptions import IdentifiersExhausted
 
 __all__ = ['slappasswd', 'ldapadd', 'genpw', 'get_uid', 'get_gid']
-
-
-SLAPPASSWD = '/usr/bin/slappasswd'
-LDAPADD = '/usr/bin/ldapadd'
-BASH = '/bin/bash'
 
 
 def slappasswd(passwd):

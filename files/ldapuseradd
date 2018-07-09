@@ -38,8 +38,7 @@ Options:
 """
 from sys import stderr, exit as exit_
 
-from ldaptools.admin import LDAPAdmin
-from ldaptools.misc import BASH, get_uid, get_gid
+from ldaptools import BASH, get_uid, get_gid, LDAPAdmin
 
 
 def main(options):
