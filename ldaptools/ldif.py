@@ -121,8 +121,10 @@ class LDIF(dict):
 
     @object_classes.setter
     def _object_classes(self, object_classes):
-        """Sets the object classes."""
-        self['objectClass'] = list(object_classes)
+        """Sets the object classes. Should not be used directly.
+        Use ldif.object_classes.add() instead.
+        """
+        self['objectClass'] = object_classes
 
     @property
     def entries(self):
