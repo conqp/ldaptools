@@ -42,7 +42,7 @@ from ldaptools.admin import LDAPAdmin
 from ldaptools.misc import BASH, get_uid, get_gid
 
 
-def ldapuseradd(options):
+def main(options):
     """Adds LDAP users."""
 
     distinguished_name = options['<dn>']
@@ -71,4 +71,4 @@ if __name__ == '__main__':
         print('docopt not installed. CLI not available.', file=stderr)
         exit_(4)
 
-    exit_(ldapuseradd(docopt(ldapuseradd.__doc__)))
+    exit_(main(docopt(__doc__))
