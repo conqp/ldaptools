@@ -35,7 +35,7 @@ def genpw(pool=ascii_letters+digits, length=8):
 def get_uid(min_=1000, max_=65544):
     """Returns a unique, unassigned user ID."""
 
-    uids = tuple(user.pw_uid for user in getpwall())
+    uids = set(user.pw_uid for user in getpwall())
 
     for uid in range(min_, max_):
         if uid not in uids:
@@ -47,7 +47,7 @@ def get_uid(min_=1000, max_=65544):
 def get_gid(min_=1000, max_=65544):
     """Returns a unique, unassigned group ID."""
 
-    gids = tuple(group.gr_gid for group in getgrall())
+    gids = set(group.gr_gid for group in getgrall())
 
     for gid in range(min_, max_):
         if gid not in gids:
