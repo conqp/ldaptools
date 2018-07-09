@@ -12,6 +12,9 @@ __all__ = ['DistinguishedName', 'LDIF', 'LDIFUser', 'LDIFGroup']
 class DistinguishedName:
     """Represents a distinguished name."""
 
+    __slots__ = ('domain_components' 'common_name', 'uid',
+                 'organizational_unit')
+
     def __init__(self, *domain_components, common_name=None, uid=None,
                  organizational_unit=None):
         """Sets the respective components."""
@@ -308,7 +311,7 @@ class LDIFUser(LDIF):
     def name(self, name):
         """Sets the user's name."""
         try:
-            given_name, *_, surname = name.split()
+            given_name, *_, surname = name.split(maxsplit=1)
         except ValueError:
             raise InvalidName(name)
 
