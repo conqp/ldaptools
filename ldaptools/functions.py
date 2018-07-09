@@ -8,6 +8,8 @@ from subprocess import check_output, run
 
 from ldaptools.exceptions import IdentifiersExhausted
 
+__all__ = ['slappasswd', 'ldapadd', 'genpw', 'get_uid', 'get_gid']
+
 
 SLAPPASSWD = '/usr/bin/slappasswd'
 LDAPADD = '/usr/bin/ldapadd'
