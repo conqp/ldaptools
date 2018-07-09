@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 #
-#  ldaptools.py.
+#  ldapuseradd - Add new LDAP users.
 #
 #  (C) 2018 Richard Neumann <mail at richard dash neumann period de>
 #
@@ -20,7 +20,7 @@
 ########################################################################
 """useradd.
 
-    Adds a new user.
+    Add new LDAP users.
 
 Usage:
     ldapuseradd <dn> <user> [options]
