@@ -17,11 +17,6 @@ class LDAPAdmin(DistinguishedName):
 
         user = LDIFUser(
             login_name, self.organizational_unit, *self.domain_components)
-
-        if passwd is None:
-            passwd = genpw()
-            print('Generated password:', passwd, flush=True)
-
         user.passwd = passwd
 
         if uid is None:
