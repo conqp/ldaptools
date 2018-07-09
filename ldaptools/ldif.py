@@ -82,6 +82,8 @@ class DistinguishedName:
 class LDIF(dict):
     """LDIF configuration."""
 
+    __slots__ = ()
+
     def __str__(self):
         """Returns the LDIF file as a string."""
         return linesep.join(self.lines)
@@ -118,6 +120,8 @@ class LDIF(dict):
 
 class LDIFUser(LDIF):
     """An LDIF user file."""
+
+    __slots__ = ()
 
     def __init__(self, uid, organizational_unit, *domain_components):
         """Sets user ID, organizational unit, domain
@@ -322,6 +326,8 @@ class LDIFUser(LDIF):
 
 class LDIFGroup(LDIF):
     """An LDIF group."""
+
+    __slots__ = ()
 
     def __init__(self, common_name, organizational_unit, *domain_components,
                  gid=None):
