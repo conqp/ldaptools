@@ -18,16 +18,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ########################################################################
-"""Tools to manage LDAP users."""
-
-from sys import stderr, exit as exit_
-
-from ldaptools.admin import LDAPAdmin
-from ldaptools.misc import BASH, get_uid, get_gid
-
-
-def ldapuseradd(options):
-    """useradd.
+"""useradd.
 
     Adds a new user.
 
@@ -45,6 +36,14 @@ Options:
     --phone=<phone>, -p     Sets the user's phone number.
     --mobile=<mobile>, -m   Sets the user's mobile phone number.
 """
+from sys import stderr, exit as exit_
+
+from ldaptools.admin import LDAPAdmin
+from ldaptools.misc import BASH, get_uid, get_gid
+
+
+def ldapuseradd(options):
+    """Adds LDAP users."""
 
     distinguished_name = options['<dn>']
     user = options['<user>']
