@@ -39,7 +39,7 @@ class DistinguishedName:
 
     def __str__(self):
         """Returns a string representation of the distinguished name."""
-        return ','.join('{}={}'.format(key, value) for key, value in self)
+        return ','.join(f'{key}={value}' for key, value in self)
 
     @classmethod
     def from_string(cls, string):
@@ -72,7 +72,7 @@ class DistinguishedName:
                 domain_components.append(value)
             else:
                 raise ValueError(
-                    'Invalid distinguished name component: {}.'.format(key))
+                    f'Invalid distinguished name component: {key}.')
 
         return cls(
             *domain_components, common_name=common_name, uid=uid,
@@ -115,7 +115,7 @@ class LDIF(dict):
     def lines(self):
         """Yields LDIF file lines."""
         for option, value in self.entries:
-            yield '{}: {}'.format(option, value)
+            yield f'{option}: {value}'
 
 
 class LDIFUser(LDIF):

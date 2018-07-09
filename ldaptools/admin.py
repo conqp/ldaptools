@@ -15,8 +15,8 @@ class LDAPAdmin(DistinguishedName):
                 home=None, name=None, title=None, phone=None, mobile=None):
         """Creates a new user."""
 
-        user = LDIFUser(login_name, self.organizational_unit,
-                        *self.domain_components)
+        user = LDIFUser(
+            login_name, self.organizational_unit, *self.domain_components)
 
         if passwd is None:
             passwd = genpw()
@@ -36,7 +36,7 @@ class LDAPAdmin(DistinguishedName):
         user.shell = shell
 
         if home is None:
-            home = '/home/{}'.format(login_name)
+            home = f'/home/{login_name}'
 
         user.home = home
 
