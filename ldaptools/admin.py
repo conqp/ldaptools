@@ -11,6 +11,8 @@ __all__ = ['LDAPAdmin']
 class LDAPAdmin(DistinguishedName):
     """Represents an LDAP admin."""
 
+    __slots__ = ()
+
     def useradd(self, login_name, passwd, uid=None, gid=None, shell=BASH,
                 home=None, name=None, title=None, phone=None, mobile=None):
         """Creates a new user."""
