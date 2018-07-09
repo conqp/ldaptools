@@ -84,6 +84,12 @@ class LDIF(dict):
 
     __slots__ = ()
 
+    def __init__(self, distinguished_name):
+        """Sets the distinguished name."""
+        super().__init__()
+        self.distinguished_name = distinguished_name
+        self._object_classes = []
+
     def __str__(self):
         """Returns the LDIF file as a string."""
         return linesep.join(self.lines)
@@ -97,6 +103,26 @@ class LDIF(dict):
                 del self[key]
         else:
             super().__setitem__(key, value)
+
+    @property
+    def distinguished_name(self):
+        """Returns the distinguished name."""
+        return self.get('dn')
+
+    @distinguished_name.setter
+    def distinguished_name(self, distinguished_name):
+        """Sets the distinguished name."""
+        self['dn'] = distinguished_name
+
+    @property
+    def object_classes(self):
+        """Returns the configured object classes."""
+        return self['objectClass']
+
+    @object_classes.setter
+    def _object_classes(self, object_classes):
+        """Sets the object classes."""
+        self['objectClass'] = list(object_classes)
 
     @property
     def entries(self):
@@ -131,30 +157,9 @@ class LDIFUser(LDIF):
         self.distinguished_name = DistinguishedName(
             *domain_components, uid=uid,
             organizational_unit=organizational_unit)
-        self.object_classes = [
+        self._object_classes = [
             'top', 'person', 'organizationalPerson', 'inetOrgPerson',
             'posixAccount', 'shadowAccount']
-
-    @property
-    def distinguished_name(self):
-        """Returns the distinguished name."""
-        return self.get('dn')
-
-    @distinguished_name.setter
-    def distinguished_name(self, distinguished_name):
-        """Sets the distinguished name."""
-        self['dn'] = distinguished_name
-        self.user_name = distinguished_name.uid
-
-    @property
-    def object_classes(self):
-        """Returns the configured object classes."""
-        return self.get('objectClass', ())
-
-    @object_classes.setter
-    def object_classes(self, object_classes):
-        """Sets the object classes."""
-        self['objectClass'] = object_classes
 
     @property
     def user_name(self):
