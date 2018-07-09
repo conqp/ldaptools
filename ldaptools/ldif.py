@@ -133,7 +133,7 @@ class LDIF(dict):
             if value is None:
                 continue
 
-            if isinstance(value, (tuple, list)):
+            if isinstance(value, (tuple, list, set, range)):
                 for item in value:
                     yield (key, item)
             else:
