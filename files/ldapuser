@@ -66,7 +66,7 @@ def _add(options):
     ldif = create(
         user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
         home=home, shell=shell, ou=ou, domain=domain)
-    dn = DistinguishedName.for_user(user_name, domain, ou=ou, cn_key='cn')
+    dn = DistinguishedName.for_master(domain, ou=ou)
     ldapadd(dn, ldif)
 
 
@@ -87,7 +87,7 @@ def _modify(options):
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
         uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
-    dn = DistinguishedName.for_user(user_name, domain, ou=ou, cn_key='cn')
+    dn = DistinguishedName.for_master(domain, ou=ou)
     ldapmodify(dn, ldif)
 
 

@@ -26,15 +26,22 @@ class DistinguishedName(list):
         return ','.join(str(component) for component in self)
 
     @classmethod
-    def for_user(cls, cn, domain, ou=CONFIG['user']['ou'], cn_key='uid'):
+    def for_user(cls, uid, domain, ou=CONFIG['user']['ou']):
         """Creates a distinguished name for a user."""
-        cn = DNComponent(cn_key, cn)
+        uid = DNComponent('uid', uid)
         ou = DNComponent('ou', ou)
-        return cls((cn, ou, *domain_components(domain)))
+        return cls((uid, ou, *domain_components(domain)))
 
     @classmethod
     def for_group(cls, cn, domain, ou=CONFIG['group']['ou']):
         """Creates a distinguished name for a group."""
+        cn = DNComponent('cn', cn)
+        ou = DNComponent('ou', ou)
+        return cls((cn, ou, *domain_components(domain)))
+
+    @classmethod
+    def for_master(cls, domain, cn=CONFIG['common']['master']):
+        """Creates a distinguished name for administrative operations."""
         cn = DNComponent('cn', cn)
         ou = DNComponent('ou', ou)
         return cls((cn, ou, *domain_components(domain)))
