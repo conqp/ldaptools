@@ -109,7 +109,6 @@ def modify(name=None, new_name=None, uid=None, gid=None, first_name=None,
         yield LDIFEntry('homeDirectory', home)
 
 
-@LDIF.constructor
 def delete(name, *, ou=OU, domain=DOMAIN):
     """Creates an LDIF to delete a user."""
 
