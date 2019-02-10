@@ -1,0 +1,16 @@
+[common]
+DOMAIN = mydomain.com
+
+[binaries]
+SLAPPASSWD = /usr/bin/slappasswd
+LDAPADD = /usr/bin/ldapadd
+
+[user]
+ou = People
+classes = top, person, organizationalPerson, inetOrgPerson, posixAccount, shadowAccount
+home = /home/{}
+shell = /bin/bash
+
+[group]
+ou = Group
+classes = top, posixGroup

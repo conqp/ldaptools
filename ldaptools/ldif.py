@@ -4,6 +4,8 @@ from functools import wraps
 from os import linesep
 from typing import NamedTuple
 
+from ldaptools.config import CONFIG
+
 
 __all__ = ['DistinguishedName', 'DNComponent', 'LDIF', 'LDIFEntry']
 
@@ -14,6 +16,23 @@ class DistinguishedName(list):
     def __str__(self):
         """Returns a string representation of the distinguished name."""
         return ','.join(str(component) for component in self)
+
+    @classmethod
+    def create(cls, ou, *dc):
+        """Creates a new distinguished name."""
+        return cls((ou, *dc))
+
+    @classmethod
+    def user(cls, uid, *dc, ou=CONFIG['user']['ou']):
+        """Creates a distinguished name for a user."""
+        uid = DNComponent('uid', uid)
+        return cls((uid, ou, *dc))
+
+    @classmethod
+    def group(cls, cn, *dc, ou=CONFIG['group']['ou']):
+        """Creates a distinguished name for a group."""
+        cn = DNComponent('cn', cn)
+        return cls((cn, ou, *dc))
 
 
 class DNComponent(NamedTuple):

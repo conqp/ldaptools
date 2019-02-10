@@ -7,9 +7,9 @@ from string import ascii_letters, digits
 from subprocess import check_output, run
 from tempfile import NamedTemporaryFile
 
-from ldaptools.constants import LDAPADD, SLAPPASSWD
+from ldaptools.config import CONFIG
 from ldaptools.exceptions import IdentifiersExhausted
-from ldaptools.ldif import LDIF
+from ldaptools.ldif import DNComponent, LDIF
 
 
 __all__ = [
@@ -18,9 +18,12 @@ __all__ = [
     'genpw',
     'get_uid',
     'get_gid',
-    'get_pwhash']
+    'get_pwhash',
+    'domain_components']
 
 
+SLAPPASSWD = CONFIG['binaries']['slappasswd']
+LDAPADD = CONFIG['binaries']['ldapadd']
 POOL = range(1000, 65545)
 
 
@@ -82,3 +85,13 @@ def get_pwhash(passwd, pwhash):
         return pwhash
 
     raise ValueError('Must specify either passwd or pwhash.')
+
+
+def domain_components(domain):
+    """Yields domain components."""
+
+    for domain_component in domain.split(','):
+        domain_component = domain_component.strip()
+
+        if domain_component:
+            yield DNComponent('dc', domain_component)
