@@ -84,7 +84,6 @@ def _modify(options):
     home = options['--home']
     ou = options['--ou'] or CONFIG['user']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
-
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
         uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
