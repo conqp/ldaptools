@@ -23,7 +23,7 @@
     Manage LDAP groups.
 
 Usage:
-    ldapgroup add <name> [options]
+    ldapgroup add <name> [<members>...] [options]
     ldapgroup modify [options]
     ldapgroup add-member <group> <member> [options]
     ldapgroup remove-member <group> <member> [options]
@@ -37,18 +37,20 @@ from sys import exit, stderr
 
 from ldaptools.functions import ldapadd, ldapmodify
 from ldaptools.group import create, modify, add, remove
+from ldaptools.ldif import DistinguishedName
 
 
 def _add(options):
     """Adds an LDAP group."""
 
     name = options['<name>']
+    members = options['<members>']
     gid = options['--gid']
     ou = options['--ou']
     domain = options['--domain']
-    ldif = create(name, gid=gid, ou=ou, domain=domain)
-    cn = DomainComponent.for_group(name, domain, ou=ou)
-    ldapadd(cn, ldif)
+    ldif = create(name, gid, members, ou=ou, domain=domain)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
+    ldapadd(dn, ldif)
 
 
 def _modify(options):
@@ -59,8 +61,8 @@ def _modify(options):
     ou = options['--ou']
     domain = options['--domain']
     ldif = modify(name, gid=gid, ou=ou, domain=domain)
-    cn = DomainComponent.for_group(name, domain, ou=ou)
-    ldapmodify(cn, ldif)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
+    ldapmodify(dn, ldif)
 
 
 def _add_member(options):
@@ -70,9 +72,9 @@ def _add_member(options):
     member = options['<member>']
     ou = options['--ou']
     domain = options['--domain']
-    ldif = add(name, member, ou=ou, domain=domain)
-    cn = DomainComponent.for_group(name, domain, ou=ou)
-    ldapmodify(cn, ldif)
+    ldif = add(group, member, ou=ou, domain=domain)
+    dn = DistinguishedName.for_group(group, domain, ou=ou)
+    ldapmodify(dn, ldif)
 
 
 def _remove_member(options):
@@ -82,9 +84,9 @@ def _remove_member(options):
     member = options['<member>']
     ou = options['--ou']
     domain = options['--domain']
-    ldif = remove(name, member, ou=ou, domain=domain)
-    cn = DomainComponent.for_group(name, domain, ou=ou)
-    ldapmodify(cn, ldif)
+    ldif = remove(group, member, ou=ou, domain=domain)
+    dn = DistinguishedName.for_group(group, domain, ou=ou)
+    ldapmodify(dn, ldif)
 
 
 def main(options):
@@ -107,4 +109,4 @@ if __name__ == '__main__':
         print('docopt not installed. CLI not available.', file=stderr)
         exit(4)
 
-    main(docopt(__doc__)
+    main(docopt(__doc__))

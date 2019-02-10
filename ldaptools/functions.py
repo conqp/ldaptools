@@ -34,28 +34,28 @@ def slappasswd(passwd):
     return check_output((SLAPPASSWD, '-s', passwd)).decode().strip()
 
 
-def ldapadd(cn, ldif):  # pylint: disable=C0103
+def ldapadd(dn, ldif):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
         with NamedTemporaryFile('w', suffix='.ldif') as tmp:
             tmp.write(str(ldif))
             tmp.flush()
-            return ldapadd(cn, tmp.name)
+            return ldapadd(dn, tmp.name)
 
-    return run((LDAPADD, '-D', str(cn), '-W', '-f', ldif))
+    return run((LDAPADD, '-D', str(dn), '-W', '-f', ldif))
 
 
-def ldapmodify(cn, ldif):  # pylint: disable=C0103
+def ldapmodify(dn, ldif):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
         with NamedTemporaryFile('w', suffix='.ldif') as tmp:
             tmp.write(str(ldif))
             tmp.flush()
-            return ldapmodify(cn, tmp.name)
+            return ldapmodify(dn, tmp.name)
 
-    return run((LDAPMODIFY, '-D', str(cn), '-W', '-f', ldif))
+    return run((LDAPMODIFY, '-D', str(dn), '-W', '-f', ldif))
 
 
 def genpw(pool=ascii_letters+digits, length=8):

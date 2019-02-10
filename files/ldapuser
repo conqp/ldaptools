@@ -38,8 +38,9 @@ Options:
 """
 from sys import exit, stderr
 
-from ldaptools.functions import ldapadd, ldapmodify
+from ldaptools.functions import ldapadd, ldapmodify, genpw
 from ldaptools.user import create, modify
+from ldaptools.ldif import DistinguishedName
 
 
 def _add(options):
@@ -64,8 +65,8 @@ def _add(options):
     ldif = create(
         user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
         home=home, shell=shell, ou=ou, domain=domain)
-    cn = DomainComponent.for_user(user_name, domain, ou=ou, cn_key='cn')
-    ldapadd(cn, ldif)
+    dn = DistinguishedName.for_user(user_name, domain, ou=ou, cn_key='cn')
+    ldapadd(dn, ldif)
 
 
 def _modify(options):
@@ -85,8 +86,8 @@ def _modify(options):
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
         uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
-    cn = DomainComponent.for_user(user_name, domain, ou=ou, cn_key='cn')
-    ldapmodify(cn, ldif)
+    dn = DistinguishedName.for_user(user_name, domain, ou=ou, cn_key='cn')
+    ldapmodify(dn, ldif)
 
 
 def main(options):
@@ -105,4 +106,4 @@ if __name__ == '__main__':
         print('docopt not installed. CLI not available.', file=stderr)
         exit(4)
 
-    main(docopt(__doc__)
+    main(docopt(__doc__))
