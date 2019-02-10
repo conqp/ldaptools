@@ -1,5 +1,5 @@
 [common]
-DOMAIN = mydomain.com
+domain = mydomain.com
 
 [binaries]
 slappasswd = /usr/bin/slappasswd

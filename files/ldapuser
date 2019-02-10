@@ -55,7 +55,7 @@ def _add(options):
     shell = options['--shell'] or CONFIG['user']['shell']
     home = options['--home'] or CONFIG['user']['home']
     ou = options['--ou'] or CONFIG['user']['ou']
-    domain = options['--domain'] CONFIG['common']['domain']
+    domain = options['--domain'] or CONFIG['common']['domain']
 
     if options['--passwd']:
         passwd = options['--passwd']
@@ -82,7 +82,7 @@ def _modify(options):
     shell = options['--shell']
     home = options['--home']
     ou = options['--ou'] or CONFIG['user']['ou']
-    domain = options['--domain'] CONFIG['common']['domain']
+    domain = options['--domain'] or CONFIG['common']['domain']
 
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
