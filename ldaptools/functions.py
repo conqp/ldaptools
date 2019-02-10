@@ -35,40 +35,40 @@ def slappasswd(passwd):
     return check_output((SLAPPASSWD, '-s', passwd)).decode().strip()
 
 
-def ldapadd(dn, ldif):  # pylint: disable=C0103
+def ldapadd(master, ldif):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
         with NamedTemporaryFile('w', suffix='.ldif') as tmp:
             tmp.write(str(ldif))
             tmp.flush()
-            return ldapadd(dn, tmp.name)
+            return ldapadd(master, tmp.name)
 
-    return run((LDAPADD, '-D', str(dn), '-W', '-f', ldif))
+    return run((LDAPADD, '-D', str(master), '-W', '-f', ldif))
 
 
-def ldapmodify(dn, ldif):  # pylint: disable=C0103
+def ldapmodify(master, ldif):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
         with NamedTemporaryFile('w', suffix='.ldif') as tmp:
             tmp.write(str(ldif))
             tmp.flush()
-            return ldapmodify(dn, tmp.name)
+            return ldapmodify(master, tmp.name)
 
-    return run((LDAPMODIFY, '-D', str(dn), '-W', '-f', ldif))
+    return run((LDAPMODIFY, '-D', str(master), '-W', '-f', ldif))
 
 
-def ldapdelete(dn, ldif):  # pylint: disable=C0103
+def ldapdelete(master, dn):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
         with NamedTemporaryFile('w', suffix='.ldif') as tmp:
             tmp.write(str(ldif))
             tmp.flush()
-            return ldapdelete(dn, tmp.name)
+            return ldapdelete(master, tmp.name)
 
-    return run((LDAPDELETE, '-D', str(dn), '-W', '-f', ldif))
+    return run((LDAPDELETE, '-D', str(master), '-W', str(dn)))
 
 
 def genpw(pool=ascii_letters+digits, length=8):

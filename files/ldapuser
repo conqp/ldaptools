@@ -67,8 +67,8 @@ def _add(options):
     ldif = create(
         user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
         home=home, shell=shell, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain)
-    ldapadd(dn, ldif)
+    master = DistinguishedName.for_master(domain)
+    ldapadd(master, ldif)
 
 
 def _modify(options):
@@ -88,8 +88,8 @@ def _modify(options):
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
         uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain)
-    ldapmodify(dn, ldif)
+    master = DistinguishedName.for_master(domain)
+    ldapmodify(master, ldif)
 
 
 def _delete(options):
@@ -98,9 +98,9 @@ def _delete(options):
     user_name = options['<user_name>']
     ou = options['--ou'] or CONFIG['user']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
-    ldif = delete(user_name, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain)
-    ldapdelete(dn, ldif)
+    dn = delete(user_name, ou=ou, domain=domain)
+    master = DistinguishedName.for_master(domain)
+    ldapdelete(master, dn)
 
 
 def main(options):

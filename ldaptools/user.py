@@ -113,5 +113,4 @@ def modify(name=None, new_name=None, uid=None, gid=None, first_name=None,
 def delete(name, *, ou=OU, domain=DOMAIN):
     """Creates an LDIF to delete a user."""
 
-    dn = DistinguishedName.for_user(name, domain, ou=ou)
-    yield LDIFEntry('dn', dn)
+    return DistinguishedName.for_user(name, domain, ou=ou)
