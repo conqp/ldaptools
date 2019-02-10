@@ -62,12 +62,6 @@ def ldapmodify(master, ldif):  # pylint: disable=C0103
 def ldapdelete(master, dn):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
-    if isinstance(ldif, LDIF):
-        with NamedTemporaryFile('w', suffix='.ldif') as tmp:
-            tmp.write(str(ldif))
-            tmp.flush()
-            return ldapdelete(master, tmp.name)
-
     return run((LDAPDELETE, '-D', str(master), '-W', str(dn)))
 
 
