@@ -8,5 +8,5 @@ setup(
     author='Richard Neumann',
     author_email='mail at richard dash neumann period de',
     packages=['ldaptools'],
-    scripts=['files/ldapuseradd'],
-    description='LDAP library and user management tools.')
+    scripts=['files/ldapuser', 'files/ldapgroup'],
+    description='LDAP library with user and group management tools.')

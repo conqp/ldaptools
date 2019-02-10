@@ -1,0 +1,110 @@
+#! /usr/bin/env python3
+#
+#  ldapgroup - Manage LDAP groups.
+#
+#  (C) 2018-2019 Richard Neumann <mail at richard dash neumann period de>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+########################################################################
+"""ldapgroup.
+
+    Manage LDAP groups.
+
+Usage:
+    ldapgroup add <name> [options]
+    ldapgroup modify [options]
+    ldapgroup add-member <group> <member> [options]
+    ldapgroup remove-member <group> <member> [options]
+
+Options:
+    --gid=<gid>, -g         Sets the user's GID.
+    --domain=<domain>       Sets the LDAP domain.
+    --help, -h              Shows this page.
+"""
+from sys import exit, stderr
+
+from ldaptools.functions import ldapadd, ldapmodify
+from ldaptools.group import create, modify, add, remove
+
+
+def _add(options):
+    """Adds an LDAP group."""
+
+    name = options['<name>']
+    gid = options['--gid']
+    ou = options['--ou']
+    domain = options['--domain']
+    ldif = create(name, gid=gid, ou=ou, domain=domain)
+    cn = DomainComponent.for_group(name, domain, ou=ou)
+    ldapadd(cn, ldif)
+
+
+def _modify(options):
+    """Modifies an LDAP group."""
+
+    name = options['<name>']
+    gid = options['--gid']
+    ou = options['--ou']
+    domain = options['--domain']
+    ldif = modify(name, gid=gid, ou=ou, domain=domain)
+    cn = DomainComponent.for_group(name, domain, ou=ou)
+    ldapmodify(cn, ldif)
+
+
+def _add_member(options):
+    """Adds a member to an LDAP group."""
+
+    group = options['<group>']
+    member = options['<member>']
+    ou = options['--ou']
+    domain = options['--domain']
+    ldif = add(name, member, ou=ou, domain=domain)
+    cn = DomainComponent.for_group(name, domain, ou=ou)
+    ldapmodify(cn, ldif)
+
+
+def _remove_member(options):
+    """Removes a member from an LDAP group."""
+
+    group = options['<group>']
+    member = options['<member>']
+    ou = options['--ou']
+    domain = options['--domain']
+    ldif = remove(name, member, ou=ou, domain=domain)
+    cn = DomainComponent.for_group(name, domain, ou=ou)
+    ldapmodify(cn, ldif)
+
+
+def main(options):
+    """Main function."""
+
+    if options['add']:
+        _add(options)
+    elif options['modify']:
+        _modify(options)
+    elif options['add-member']:
+        _add_member(options)
+    elif options['remove-member']:
+        _remove_member(options)
+
+
+if __name__ == '__main__':
+    try:
+        from docopt import docopt
+    except ImportError:
+        print('docopt not installed. CLI not available.', file=stderr)
+        exit(4)
+
+    main(docopt(__doc__)
