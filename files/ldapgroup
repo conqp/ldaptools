@@ -30,6 +30,7 @@ Usage:
 
 Options:
     --gid=<gid>, -g         Sets the user's GID.
+    --ou=<ou>               Sets the organizational unit.
     --domain=<domain>       Sets the LDAP domain.
     --help, -h              Shows this page.
 """
@@ -111,3 +112,4 @@ if __name__ == '__main__':
         exit(4)
 
     main(docopt(__doc__))
+
