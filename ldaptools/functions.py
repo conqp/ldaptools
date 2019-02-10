@@ -26,7 +26,12 @@ SLAPPASSWD = CONFIG['binaries']['slappasswd']
 LDAPADD = CONFIG['binaries']['ldapadd']
 LDAPMODIFY = CONFIG['binaries']['ldapmodify']
 LDAPDELETE = CONFIG['binaries']['ldapdelete']
-POOL = range(1000, 65545)
+MIN_UID = int(CONFIG['user']['min_uid'])
+MAX_UID = int(CONFIG['user']['max_uid'])
+MIN_GID = int(CONFIG['group']['min_gid'])
+MAX_GID = int(CONFIG['group']['max_gid'])
+UID_POOL = range(MIN_UID, MAX_UID)
+GID_POOL = range(MIN_GID, MAX_GID)
 
 
 def slappasswd(passwd):
@@ -71,7 +76,7 @@ def genpw(pool=ascii_letters+digits, length=8):
     return ''.join(choices(pool, k=length))
 
 
-def get_uid(pool=POOL):
+def get_uid(pool=UID_POOL):
     """Returns a unique, unassigned user ID."""
 
     uids = frozenset(user.pw_uid for user in getpwall())
@@ -83,7 +88,7 @@ def get_uid(pool=POOL):
     raise IdentifiersExhausted('UIDs exhausted.')
 
 
-def get_gid(pool=POOL):
+def get_gid(pool=GID_POOL):
     """Returns a unique, unassigned group ID."""
 
     gids = frozenset(group.gr_gid for group in getgrall())

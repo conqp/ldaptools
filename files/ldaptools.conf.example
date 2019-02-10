@@ -13,7 +13,11 @@ ou = People
 classes = top, person, organizationalPerson, inetOrgPerson, posixAccount, shadowAccount
 home = /home/{}
 shell = /bin/bash
+min_uid = 2000
+max_uid = 65545
 
 [group]
 ou = Group
 classes = top, posixGroup
+min_gid = 2000
+max_gid = 65545
