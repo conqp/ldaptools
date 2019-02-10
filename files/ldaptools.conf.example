@@ -2,8 +2,9 @@
 DOMAIN = mydomain.com
 
 [binaries]
-SLAPPASSWD = /usr/bin/slappasswd
-LDAPADD = /usr/bin/ldapadd
+slappasswd = /usr/bin/slappasswd
+ldapadd = /usr/bin/ldapadd
+ldapmodify = /usr/bin/ldapmodify
 
 [user]
 ou = People

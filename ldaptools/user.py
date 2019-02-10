@@ -1,7 +1,7 @@
 """User and group management."""
 
 from ldaptools.config import CONFIG
-from ldaptools.functions import get_uid, get_gid, get_pwhash, domain_components
+from ldaptools.functions import get_uid, get_gid, get_pwhash
 from ldaptools.ldif import DistinguishedName, LDIF, LDIFEntry
 
 
@@ -29,12 +29,11 @@ def get_cn(first_name, last_name):
 
 
 @LDIF.constructor
-def create(name, uid, gid, first_name, last_name, passwd=None, pwhash=None,
-           home=HOME, shell=SHELL, *, ou=OU, domain=DOMAIN):
+def create(name, first_name, last_name, passwd=None, pwhash=None, uid=None,
+           gid=None, home=HOME, shell=SHELL, *, ou=OU, domain=DOMAIN):
     """Creates an LDIF represeting a new user."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.user(name, *dc, ou=ou)
+    dn = DistinguishedName.for_user(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
 
     for clas in CLASSES:
@@ -62,8 +61,7 @@ def modify(name=None, new_name=None, uid=None, gid=None, first_name=None,
            ou=OU, domain=DOMAIN):
     """Creates an LDIF represeting a new user."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.user(name, *dc, ou=ou)
+    dn = DistinguishedName.for_user(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
     yield LDIFEntry('changetype', 'modify')
 

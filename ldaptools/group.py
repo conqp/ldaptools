@@ -1,7 +1,6 @@
 """Group LDIFs."""
 
 from ldaptools.config import CONFIG
-from ldaptools.functions import domain_components
 from ldaptools.ldif import DistinguishedName, DNComponent, LDIF, LDIFEntry
 
 
@@ -24,8 +23,7 @@ def get_dn(dn, name):   # pylint: disable=C0103
 def create(name, gid, members, *, ou=OU, domain=DOMAIN):
     """Creates a new group LDIF."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.group(name, *dc, ou=ou)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
     yield LDIFEntry('cn', name)
     yield LDIFEntry('gidNumber', gid)
@@ -41,8 +39,7 @@ def create(name, gid, members, *, ou=OU, domain=DOMAIN):
 def modify(name, new_name=None, gid=None, *, ou=OU, domain=DOMAIN):
     """Modifies an existing group."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.group(name, *dc, ou=ou)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
     yield LDIFEntry('changetype', 'modify')
 
@@ -59,8 +56,7 @@ def modify(name, new_name=None, gid=None, *, ou=OU, domain=DOMAIN):
 def add(name, member, *, ou=OU, domain=DOMAIN):
     """Adds a member to the group."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.group(name, *dc, ou=ou)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
     yield LDIFEntry('changetype', 'modify')
     yield LDIFEntry('add', 'memberUid')
@@ -71,8 +67,7 @@ def add(name, member, *, ou=OU, domain=DOMAIN):
 def remove(name, member, *, ou=OU, domain=DOMAIN):
     """Adds a member to the group."""
 
-    dc = domain_components(domain)
-    dn = DistinguishedName.group(name, *dc, ou=ou)
+    dn = DistinguishedName.for_group(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
     yield LDIFEntry('changetype', 'modify')
     yield LDIFEntry('delete', 'memberUid')

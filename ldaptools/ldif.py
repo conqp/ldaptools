@@ -10,6 +10,14 @@ from ldaptools.config import CONFIG
 __all__ = ['DistinguishedName', 'DNComponent', 'LDIF', 'LDIFEntry']
 
 
+def domain_components(domain):
+    """Yields domain components."""
+
+    for domain_component in domain.split('.'):
+        if domain_component:
+            yield DNComponent('dc', domain_component)
+
+
 class DistinguishedName(list):
     """Represents a distinguished name."""
 
@@ -18,21 +26,18 @@ class DistinguishedName(list):
         return ','.join(str(component) for component in self)
 
     @classmethod
-    def create(cls, ou, *dc):
-        """Creates a new distinguished name."""
-        return cls((ou, *dc))
-
-    @classmethod
-    def user(cls, uid, *dc, ou=CONFIG['user']['ou']):
+    def for_user(cls, cn, domain, ou=CONFIG['user']['ou'], cn_key='uid'):
         """Creates a distinguished name for a user."""
-        uid = DNComponent('uid', uid)
-        return cls((uid, ou, *dc))
+        cn = DNComponent(cn_key, cn)
+        ou = DNComponent('ou', ou)
+        return cls((cn, ou, *domain_components(domain)))
 
     @classmethod
-    def group(cls, cn, *dc, ou=CONFIG['group']['ou']):
+    def for_group(cls, cn, domain, ou=CONFIG['group']['ou']):
         """Creates a distinguished name for a group."""
         cn = DNComponent('cn', cn)
-        return cls((cn, ou, *dc))
+        ou = DNComponent('ou', ou)
+        return cls((cn, ou, *domain_components(domain)))
 
 
 class DNComponent(NamedTuple):

@@ -23,44 +23,78 @@
     Add new LDAP users.
 
 Usage:
-    ldapuseradd <dn> <user> [options]
+    ldapuser add <user_name> <first_name> <last_name> [options]
+    ldapuser modify <user_name> [<first_name> <last_name>] [options]
 
 Options:
-    --passwd=<passwd>, -P   Sets the user's password.
+    --passwd=<passwd>, -p   Sets the user's password.
     --uid=<uid>, -u         Sets the user's UID.
     --gid=<gid>, -g         Sets the user's GID.
     --shell=<shell>, -s     Sets the user's logn shell.
     --home=<home>, -d       Sets the user's home directory.
-    --name=<name>, -n       Sets the user's full name.
-    --title=<title>, -t     Sets the user's title.
-    --phone=<phone>, -p     Sets the user's phone number.
-    --mobile=<mobile>, -m   Sets the user's mobile phone number.
+    --ou=<ou>               Sets the organizational unit.
+    --domain=<domain>       Sets the LDAP domain.
+    --help, -h              Shows this page.
 """
-from sys import stderr, exit as exit_
+from sys import exit, stderr
 
-from ldaptools import BASH, get_uid, get_gid, LDAPAdmin
+from ldaptools.user import add, modify
+
+
+def add(options):
+    """Adds an LDAP user."""
+
+    user_name = options['<user_name>']
+    first_name = options['<first_name>']
+    last_name = options['<last_name>']
+    uid = options['--uid']
+    gid = options['--gid']
+    shell = options['--shell']
+    home = options['--home']
+    ou = options['--ou']
+    domain = options['--domain']
+
+    if options['--passwd']:
+        passwd = options['--passwd']
+    else:
+        passwd = genpw()
+        print('Generated password:', passwd)
+
+    ldif = add(
+        user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
+        home=home, shell=shell, ou=ou, domain=domain)
+    cn = DomainComponent.for_user(user_name, domain, ou=ou, cn_key='cn')
+    ldapadd(cn, ldif)
+
+
+def modify(options):
+    """Modifies an LDAP user."""
+
+    user_name = options['<user_name>']
+    first_name = options['<first_name>']
+    last_name = options['<last_name>']
+    passwd = options['--passwd']
+    uid = options['--uid']
+    gid = options['--gid']
+    shell = options['--shell']
+    home = options['--home']
+    ou = options['--ou']
+    domain = options['--domain']
+
+    ldif = modify(
+        user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
+        home=home, shell=shell, ou=ou, domain=domain)
+    cn = DomainComponent.for_user(user_name, domain, ou=ou, cn_key='cn')
+    ldapadd(cn, ldif)
 
 
 def main(options):
-    """Adds LDAP users."""
+    """Main function."""
 
-    distinguished_name = options['<dn>']
-    user = options['<user>']
-    passwd = options['--passwd']
-    uid = options['--uid'] or get_uid()
-    gid = options['--gid'] or get_gid()
-    shell = options['--shell'] or BASH
-    home = options['--home']
-    name = options['--name']
-    title = options['--title']
-    phone = options['--phone']
-    mobile = options['--mobile']
-    admin = LDAPAdmin.from_string(distinguished_name)
-    admin.useradd(
-        user, passwd, uid=uid, gid=gid, shell=shell, home=home, name=name,
-        title=title, phone=phone, mobile=mobile)
-
-    return 0
+    if options['add']:
+        add(options)
+    elif options['modify']:
+        modify(options)
 
 
 if __name__ == '__main__':
@@ -68,6 +102,6 @@ if __name__ == '__main__':
         from docopt import docopt
     except ImportError:
         print('docopt not installed. CLI not available.', file=stderr)
-        exit_(4)
+        exit(4)
 
-    exit_(main(docopt(__doc__))
+    main(docopt(__doc__)
