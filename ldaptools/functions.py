@@ -25,6 +25,7 @@ __all__ = [
 SLAPPASSWD = CONFIG['binaries']['slappasswd']
 LDAPADD = CONFIG['binaries']['ldapadd']
 LDAPMODIFY = CONFIG['binaries']['ldapmodify']
+LDAPDELETE = CONFIG['binaries']['ldapdelete']
 POOL = range(1000, 65545)
 
 
@@ -56,6 +57,18 @@ def ldapmodify(dn, ldif):  # pylint: disable=C0103
             return ldapmodify(dn, tmp.name)
 
     return run((LDAPMODIFY, '-D', str(dn), '-W', '-f', ldif))
+
+
+def ldapdelete(dn, ldif):  # pylint: disable=C0103
+    """Adds the respective LDIF file."""
+
+    if isinstance(ldif, LDIF):
+        with NamedTemporaryFile('w', suffix='.ldif') as tmp:
+            tmp.write(str(ldif))
+            tmp.flush()
+            return ldapdelete(dn, tmp.name)
+
+    return run((LDAPDELETE, '-D', str(dn), '-W', '-f', ldif))
 
 
 def genpw(pool=ascii_letters+digits, length=8):

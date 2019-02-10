@@ -39,8 +39,8 @@ Options:
 from sys import exit, stderr
 
 from ldaptools.config import CONFIG
-from ldaptools.functions import ldapadd, ldapmodify, genpw
-from ldaptools.user import create, modify
+from ldaptools.functions import ldapadd, ldapmodify, ldapdelete, genpw
+from ldaptools.user import create, modify, delete
 from ldaptools.ldif import DistinguishedName
 
 
@@ -89,6 +89,17 @@ def _modify(options):
         uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
     dn = DistinguishedName.for_master(domain)
     ldapmodify(dn, ldif)
+
+
+def _delete(options):
+    """Deletes the respective user."""
+
+    user_name = options['<user_name>']
+    ou = options['--ou'] or CONFIG['user']['ou']
+    domain = options['--domain'] or CONFIG['common']['domain']
+    ldif = delete(user_name, ou=ou, domain=domain)
+    dn = DistinguishedName.for_master(domain)
+    ldapdelete(dn, ldif)
 
 
 def main(options):

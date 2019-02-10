@@ -59,7 +59,7 @@ def create(name, first_name, last_name, passwd=None, pwhash=None, uid=None,
 def modify(name=None, new_name=None, uid=None, gid=None, first_name=None,
            last_name=None, passwd=None, pwhash=None, home=None, shell=None, *,
            ou=OU, domain=DOMAIN):
-    """Creates an LDIF represeting a new user."""
+    """Creates an LDIF to modify a user."""
 
     dn = DistinguishedName.for_user(name, domain, ou=ou)
     yield LDIFEntry('dn', dn)
@@ -107,3 +107,11 @@ def modify(name=None, new_name=None, uid=None, gid=None, first_name=None,
     if home is not None:
         yield LDIFEntry('replace', 'homeDirectory')
         yield LDIFEntry('homeDirectory', home)
+
+
+@LDIF.constructor
+def delete(name, *, ou=OU, domain=DOMAIN):
+    """Creates an LDIF to delete a user."""
+
+    dn = DistinguishedName.for_user(name, domain, ou=ou)
+    yield LDIFEntry('dn', dn)

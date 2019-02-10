@@ -6,6 +6,7 @@ domain = mydomain.com
 slappasswd = /usr/bin/slappasswd
 ldapadd = /usr/bin/ldapadd
 ldapmodify = /usr/bin/ldapmodify
+ldapdelete = /usr/bin/ldapdelete
 
 [user]
 ou = People
