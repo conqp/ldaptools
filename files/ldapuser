@@ -38,6 +38,7 @@ Options:
 """
 from sys import exit, stderr
 
+from ldaptools.config import CONFIG
 from ldaptools.functions import ldapadd, ldapmodify, genpw
 from ldaptools.user import create, modify
 from ldaptools.ldif import DistinguishedName
@@ -51,10 +52,10 @@ def _add(options):
     last_name = options['<last_name>']
     uid = options['--uid']
     gid = options['--gid']
-    shell = options['--shell']
-    home = options['--home']
-    ou = options['--ou']
-    domain = options['--domain']
+    shell = options['--shell'] or CONFIG['user']['shell']
+    home = options['--home'] or CONFIG['user']['home']
+    ou = options['--ou'] or CONFIG['user']['ou']
+    domain = options['--domain'] CONFIG['common']['domain']
 
     if options['--passwd']:
         passwd = options['--passwd']
@@ -80,8 +81,8 @@ def _modify(options):
     gid = options['--gid']
     shell = options['--shell']
     home = options['--home']
-    ou = options['--ou']
-    domain = options['--domain']
+    ou = options['--ou'] or CONFIG['user']['ou']
+    domain = options['--domain'] CONFIG['common']['domain']
 
     ldif = modify(
         user_name, first_name=first_name, last_name=last_name, passwd=passwd,
