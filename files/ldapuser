@@ -25,6 +25,7 @@
 Usage:
     ldapuser add <user_name> <first_name> <last_name> [options]
     ldapuser modify <user_name> [<first_name> <last_name>] [options]
+    ldapuser delete <user_name> [options]
 
 Options:
     --passwd=<passwd>, -p   Sets the user's password.
@@ -108,6 +109,8 @@ def main(options):
     if options['add']:
         _add(options)
     elif options['modify']:
+        _modify(options)
+    elif _delete['delete']:
         _modify(options)
 
 
