@@ -43,8 +43,7 @@ class DistinguishedName(list):
     def for_master(cls, domain, cn=CONFIG['common']['master']):
         """Creates a distinguished name for administrative operations."""
         cn = DNComponent('cn', cn)
-        ou = DNComponent('ou', ou)
-        return cls((cn, ou, *domain_components(domain)))
+        return cls((cn, *domain_components(domain)))
 
 
 class DNComponent(NamedTuple):
