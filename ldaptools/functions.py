@@ -62,7 +62,7 @@ def ldapmodify(master, ldif):  # pylint: disable=C0103
 def ldapdelete(master, dn):  # pylint: disable=C0103
     """Adds the respective LDIF file."""
 
-    return run((LDAPDELETE, '-D', str(master), '-W', str(dn)))
+    return run((LDAPDELETE, '-D', str(master), str(dn), '-W'))
 
 
 def genpw(pool=ascii_letters+digits, length=8):
