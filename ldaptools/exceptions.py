@@ -14,5 +14,3 @@ class InvalidName(ValueError):
 
 class IdentifiersExhausted(Exception):
     """Indicates that the respective pool of identifiers is exhausted."""
-
-    pass
