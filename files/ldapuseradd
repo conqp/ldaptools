@@ -38,6 +38,7 @@ Options:
 """
 from sys import exit, stderr
 
+from ldaptools.functions import ldapadd, ldapmodify
 from ldaptools.user import add, modify
 
 
@@ -85,7 +86,7 @@ def modify(options):
         user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
         home=home, shell=shell, ou=ou, domain=domain)
     cn = DomainComponent.for_user(user_name, domain, ou=ou, cn_key='cn')
-    ldapadd(cn, ldif)
+    ldapmodify(cn, ldif)
 
 
 def main(options):
