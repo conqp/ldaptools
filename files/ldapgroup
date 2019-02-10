@@ -50,7 +50,7 @@ def _add(options):
     ou = options['--ou'] or CONFIG['group']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
     ldif = create(name, gid, members, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain, ou=ou)
+    dn = DistinguishedName.for_master(domain)
     ldapadd(dn, ldif)
 
 
@@ -62,7 +62,7 @@ def _modify(options):
     ou = options['--ou'] or CONFIG['group']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
     ldif = modify(name, gid=gid, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain, ou=ou)
+    dn = DistinguishedName.for_master(domain)
     ldapmodify(dn, ldif)
 
 
@@ -74,7 +74,7 @@ def _add_member(options):
     ou = options['--ou'] or CONFIG['group']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
     ldif = add(group, member, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain, ou=ou)
+    dn = DistinguishedName.for_master(domain)
     ldapmodify(dn, ldif)
 
 
@@ -86,7 +86,7 @@ def _remove_member(options):
     ou = options['--ou'] or CONFIG['group']['ou']
     domain = options['--domain'] or CONFIG['common']['domain']
     ldif = remove(group, member, ou=ou, domain=domain)
-    dn = DistinguishedName.for_master(domain, ou=ou)
+    dn = DistinguishedName.for_master(domain)
     ldapmodify(dn, ldif)
 
 
