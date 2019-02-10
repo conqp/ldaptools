@@ -110,8 +110,8 @@ def main(options):
         _add(options)
     elif options['modify']:
         _modify(options)
-    elif _delete['delete']:
-        _modify(options)
+    elif options['delete']:
+        _delete(options)
 
 
 if __name__ == '__main__':
