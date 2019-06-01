@@ -18,98 +18,83 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ########################################################################
-"""ldapgroup.
+"""Manage LDAP groups."""
 
-    Manage LDAP groups.
+from logging import INFO, basicConfig, getLogger
+from sys import argv
 
-Usage:
-    ldapgroup add <name> [<members>...] [options]
-    ldapgroup modify [options]
-    ldapgroup add-member <group> <member> [options]
-    ldapgroup remove-member <group> <member> [options]
-
-Options:
-    --gid=<gid>, -g         Sets the user's GID.
-    --ou=<ou>               Sets the organizational unit.
-    --domain=<domain>       Sets the LDAP domain.
-    --help, -h              Shows this page.
-"""
-from sys import exit, stderr
-
+from ldaptools.cli import LOG_FORMAT
+from ldaptools.cli.ldapgroup import get_args
 from ldaptools.config import CONFIG
 from ldaptools.functions import ldapadd, ldapmodify
 from ldaptools.group import create, modify, add, remove
 from ldaptools.ldif import DistinguishedName
 
 
-def _add(options):
+LOGGER = getLogger(argv[0])
+
+
+def _add(args):
     """Adds an LDAP group."""
 
-    name = options['<name>']
-    members = options['<members>']
-    gid = options['--gid']
-    ou = options['--ou'] or CONFIG['group']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
-    ldif = create(name, gid, members, ou=ou, domain=domain)
+    ou = args.ou or CONFIG['group']['ou']
+    domain = args.domain or CONFIG['common']['domain']
+    ldif = create(args.name, args.gid, args.member, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
 
 
-def _modify(options):
+def _modify(args):
     """Modifies an LDAP group."""
 
-    name = options['<name>']
-    gid = options['--gid']
-    ou = options['--ou'] or CONFIG['group']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
-    ldif = modify(name, gid=gid, ou=ou, domain=domain)
+    ou = args.ou or CONFIG['group']['ou']
+    domain = args.domain or CONFIG['common']['domain']
+    ldif = modify(args.name, gid=args.gid, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
 
 
-def _add_member(options):
+def _add_member(args):
     """Adds a member to an LDAP group."""
 
-    group = options['<group>']
-    member = options['<member>']
-    ou = options['--ou'] or CONFIG['group']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
-    ldif = add(group, member, ou=ou, domain=domain)
-    master = DistinguishedName.for_master(domain)
-    ldapmodify(master, ldif)
+    ou = args.ou or CONFIG['group']['ou']
+    domain = args.domain or CONFIG['common']['domain']
+
+    for member in args.member:
+        ldif = add(args.group, member, ou=ou, domain=domain)
+        master = DistinguishedName.for_master(domain)
+        ldapmodify(master, ldif)
 
 
-def _remove_member(options):
+def _remove_member(args):
     """Removes a member from an LDAP group."""
 
-    group = options['<group>']
-    member = options['<member>']
-    ou = options['--ou'] or CONFIG['group']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
-    ldif = remove(group, member, ou=ou, domain=domain)
-    master = DistinguishedName.for_master(domain)
-    ldapmodify(master, ldif)
+    ou = args.ou or CONFIG['group']['ou']
+    domain = args.domain or CONFIG['common']['domain']
+
+    for member in args.member:
+        ldif = remove(args.group, member, ou=ou, domain=domain)
+        master = DistinguishedName.for_master(domain)
+        ldapmodify(master, ldif)
 
 
-def main(options):
+def main():
     """Main function."""
 
-    if options['add']:
-        _add(options)
-    elif options['modify']:
-        _modify(options)
-    elif options['add-member']:
-        _add_member(options)
-    elif options['remove-member']:
-        _remove_member(options)
+    args = get_args()
+    basicConfig(level=INFO, format=LOG_FORMAT)
+
+    if args.action == 'add':
+        _add(args)
+    elif args.action == 'modify':
+        _modify(args)
+    elif args.action == 'add-member':
+        _add_member(args)
+    elif args.action == 'remove-member':
+        _remove_member(args)
+    else:
+        LOGGER.error('No action specified.')
 
 
 if __name__ == '__main__':
-    try:
-        from docopt import docopt
-    except ImportError:
-        print('docopt not installed. CLI not available.', file=stderr)
-        exit(4)
-
-    main(docopt(__doc__))
-
+    main()

@@ -18,106 +18,82 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ########################################################################
-"""ldapuser.
+"""Manage LDAP users."""
 
-    Manage LDAP users.
+from logging import INFO, basicConfig, getLogger
+from sys import argv
 
-Usage:
-    ldapuser add <user_name> <first_name> <last_name> [options]
-    ldapuser modify <user_name> [<first_name> <last_name>] [options]
-    ldapuser delete <user_name> [options]
-
-Options:
-    --passwd=<passwd>, -p   Sets the user's password.
-    --uid=<uid>, -u         Sets the user's UID.
-    --gid=<gid>, -g         Sets the user's GID.
-    --shell=<shell>, -s     Sets the user's logn shell.
-    --home=<home>, -d       Sets the user's home directory.
-    --ou=<ou>               Sets the organizational unit.
-    --domain=<domain>       Sets the LDAP domain.
-    --help, -h              Shows this page.
-"""
-from sys import exit, stderr
-
+from ldaptools.cli import LOG_FORMAT
+from ldaptools.cli.ldapuser import get_args
 from ldaptools.config import CONFIG
 from ldaptools.functions import ldapadd, ldapmodify, ldapdelete, genpw
 from ldaptools.user import create, modify, delete
 from ldaptools.ldif import DistinguishedName
 
 
-def _add(options):
+LOGGER = getLogger(argv[0])
+
+
+def _add(args):
     """Adds an LDAP user."""
 
-    user_name = options['<user_name>']
-    first_name = options['<first_name>']
-    last_name = options['<last_name>']
-    uid = options['--uid']
-    gid = options['--gid']
-    shell = options['--shell'] or CONFIG['user']['shell']
-    home = options['--home'] or CONFIG['user']['home']
-    ou = options['--ou'] or CONFIG['user']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
+    shell = args.shell or CONFIG['user']['shell']
+    home = args.home or CONFIG['user']['home']
+    ou = args.ou or CONFIG['user']['ou']
+    domain = args.domain or CONFIG['common']['domain']
 
-    if options['--passwd']:
-        passwd = options['--passwd']
+    if args.passwd:
+        passwd = args.passwd
     else:
         passwd = genpw()
-        print('Generated password:', passwd)
+        LOGGER.info('Generated password: %s', passwd)
 
     ldif = create(
-        user_name, first_name, last_name, passwd=passwd, uid=uid, gid=gid,
-        home=home, shell=shell, ou=ou, domain=domain)
+        args.user_name, args.first_name, args.last_name, passwd=passwd,
+        uid=args.uid, gid=args.gid, home=home, shell=shell, ou=ou,
+        domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
 
 
-def _modify(options):
+def _modify(args):
     """Modifies an LDAP user."""
 
-    user_name = options['<user_name>']
-    first_name = options['<first_name>']
-    last_name = options['<last_name>']
-    passwd = options['--passwd']
-    uid = options['--uid']
-    gid = options['--gid']
-    shell = options['--shell']
-    home = options['--home']
-    ou = options['--ou'] or CONFIG['user']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
+    ou = args.ou or CONFIG['user']['ou']
+    domain = args.domain or CONFIG['common']['domain']
     ldif = modify(
-        user_name, first_name=first_name, last_name=last_name, passwd=passwd,
-        uid=uid, gid=gid, home=home, shell=shell, ou=ou, domain=domain)
+        args.user_name, first_name=args.first_name, last_name=args.last_name,
+        passwd=args.passwd, uid=args.uid, gid=args.gid, home=args.home,
+        shell=args.shell, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
 
 
-def _delete(options):
+def _delete(args):
     """Deletes the respective user."""
 
-    user_name = options['<user_name>']
-    ou = options['--ou'] or CONFIG['user']['ou']
-    domain = options['--domain'] or CONFIG['common']['domain']
-    dn = delete(user_name, ou=ou, domain=domain)
+    ou = args.ou or CONFIG['user']['ou']
+    domain = args.domain or CONFIG['common']['domain']
+    dn = delete(args.user_name, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapdelete(master, dn)
 
 
-def main(options):
+def main():
     """Main function."""
 
-    if options['add']:
-        _add(options)
-    elif options['modify']:
-        _modify(options)
-    elif options['delete']:
-        _delete(options)
+    args = get_args()
+    basicConfig(level=INFO, format=LOG_FORMAT)
+
+    if args.action == 'add':
+        _add(args)
+    elif args.action == 'modify':
+        _modify(args)
+    elif args.action == 'delete':
+        _delete(args)
+    else:
+        LOGGER.error('No action specified.')
 
 
 if __name__ == '__main__':
-    try:
-        from docopt import docopt
-    except ImportError:
-        print('docopt not installed. CLI not available.', file=stderr)
-        exit(4)
-
-    main(docopt(__doc__))
+    main()

@@ -7,6 +7,6 @@ setup(
     version='latest',
     author='Richard Neumann',
     author_email='mail at richard dash neumann period de',
-    packages=['ldaptools'],
+    packages=['ldaptools', 'ldaptools.cli'],
     scripts=['files/ldapuser', 'files/ldapgroup'],
     description='LDAP library with user and group management tools.')
