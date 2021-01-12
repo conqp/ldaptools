@@ -3,16 +3,12 @@
 from __future__ import annotations
 from functools import wraps
 from os import linesep
-from typing import Iterator, NamedTuple
+from typing import Iterator, NamedTuple, Optional
 
 from ldaptools.config import CONFIG
 
 
 __all__ = ['DistinguishedName', 'DNComponent', 'LDIF', 'LDIFEntry']
-
-USER_OU = CONFIG.get('user', 'ou', fallback=None)
-GROUP_OU = CONFIG.get('group', 'ou', fallback=None)
-MASTER_CN = CONFIG.get('common', 'master', fallback=None)
 
 
 # pylint: disable=C0103
@@ -33,24 +29,27 @@ class DistinguishedName(list):
 
     @classmethod
     def for_user(cls, uid: str, domain: str, *,
-                 ou: str = USER_OU) -> DistinguishedName:
+                 ou: Optional[str] = None) -> DistinguishedName:
         """Creates a distinguished name for a user."""
+        ou = CONFIG.get('user', 'ou') if ou is None else ou
         uid = DNComponent('uid', uid)
         ou = DNComponent('ou', ou)
         return cls((uid, ou, *domain_components(domain)))
 
     @classmethod
     def for_group(cls, cn: str, domain: str, *,
-                  ou: str = GROUP_OU) -> DistinguishedName:
+                  ou: Optional[str] = None) -> DistinguishedName:
         """Creates a distinguished name for a group."""
+        ou = CONFIG.get('group', 'ou') if ou is None else ou
         cn = DNComponent('cn', cn)
         ou = DNComponent('ou', ou)
         return cls((cn, ou, *domain_components(domain)))
 
     @classmethod
     def for_master(cls, domain: str, *,
-                   cn: str = MASTER_CN) -> DistinguishedName:
+                   cn: Optional[str] = None) -> DistinguishedName:
         """Creates a distinguished name for administrative operations."""
+        cn = CONFIG.get('common', 'master') if cn is None else cn
         cn = DNComponent('cn', cn)
         return cls((cn, *domain_components(domain)))
 

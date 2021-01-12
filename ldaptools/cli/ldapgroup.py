@@ -3,7 +3,7 @@
 from argparse import ArgumentParser, Namespace, _SubParsersAction
 from logging import INFO, basicConfig
 
-from ldaptools.config import CONFIG
+from ldaptools.config import CONFIG, CONFIG_FILE
 from ldaptools.functions import ldapadd, ldapmodify
 from ldaptools.group import create, modify, add, remove
 from ldaptools.ldif import DistinguishedName
@@ -110,6 +110,7 @@ def main() -> None:
 
     args = get_args()
     basicConfig(level=INFO, format=LOG_FORMAT)
+    CONFIG.read(CONFIG_FILE)
 
     if args.action == 'add':
         _add(args)

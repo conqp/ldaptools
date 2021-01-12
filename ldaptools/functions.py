@@ -14,7 +14,7 @@ from ldaptools.ldif import DistinguishedName, LDIF
 
 
 __all__ = [
-    'stripped_str_set',
+    'classes',
     'slappasswd',
     'ldapadd',
     'ldapmodify',
@@ -24,21 +24,17 @@ __all__ = [
     'get_pwhash'
 ]
 
-
-SLAPPASSWD = CONFIG['binaries']['slappasswd']
-LDAPADD = CONFIG['binaries']['ldapadd']
-LDAPMODIFY = CONFIG['binaries']['ldapmodify']
-LDAPDELETE = CONFIG['binaries']['ldapdelete']
-MIN_UID = int(CONFIG['user']['min_uid'])
-MAX_UID = int(CONFIG['user']['max_uid'])
-MIN_GID = int(CONFIG['group']['min_gid'])
-MAX_GID = int(CONFIG['group']['max_gid'])
-UID_POOL = range(MIN_UID, MAX_UID)
-GID_POOL = range(MIN_GID, MAX_GID)
+SLAPPASSWD = '/usr/bin/slappasswd'
+LDAPADD = '/usr/bin/ldapadd'
+LDAPMODIFY = '/usr/bin/ldapmodify'
+LDAPDELETE = '/usr/bin/ldapdelete'
 
 
-def stripped_str_set(string: str, *, sep: str = ',') -> set[str]:
-    """Returns a set of stripped strings."""
+def classes(string: Optional[str], *, sep: str = ',') -> set[str]:
+    """Returns a set of stripped class names."""
+
+    if string is None:
+        return set()
 
     return set(filter(None, map(str.strip, string.split(sep))))
 
@@ -46,7 +42,8 @@ def stripped_str_set(string: str, *, sep: str = ',') -> set[str]:
 def slappasswd(passwd: str) -> str:
     """Hashes a plain text password for LDIF."""
 
-    return check_output([SLAPPASSWD, '-s', passwd], text=True).strip()
+    binary = CONFIG.get('binaries', 'slappasswd', fallback=SLAPPASSWD)
+    return check_output([binary, '-s', passwd], text=True).strip()
 
 
 def ldapadd(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
@@ -58,7 +55,8 @@ def ldapadd(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
             tmp.flush()
             return ldapadd(master, tmp.name)
 
-    return run([LDAPADD, '-D', str(master), '-W', '-f', ldif], check=True)
+    binary = CONFIG.get('binaries','ldapadd', fallback=LDAPADD)
+    return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
 
 
 def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
@@ -70,7 +68,8 @@ def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
             tmp.flush()
             return ldapmodify(master, tmp.name)
 
-    return run([LDAPMODIFY, '-D', str(master), '-W', '-f', ldif], check=True)
+    binary = CONFIG.get('binaries', 'ldapmodify', fallback=LDAPMODIFY)
+    return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
 
 
 # pylint: disable=C0103
@@ -78,7 +77,8 @@ def ldapdelete(master: DistinguishedName, dn: DistinguishedName) \
                 -> CompletedProcess:
     """Adds the respective LDIF file."""
 
-    return run([LDAPDELETE, '-D', str(master), str(dn), '-W'], check=True)
+    binary = CONFIG.get('binaries', 'ldapdelete', fallback=LDAPDELETE)
+    return run([binary, '-D', str(master), str(dn), '-W'], check=True)
 
 
 def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
@@ -87,8 +87,12 @@ def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
     return ''.join(choices(pool, k=length))
 
 
-def get_uid(pool: range = UID_POOL) -> int:
+def get_uid(*, pool: Optional[range] = None) -> int:
     """Returns a unique, unassigned user ID."""
+
+    if pool is None:
+        pool = range(CONFIG.getint('user', 'min_uid', fallback=2000),
+                     CONFIG.getint('user', 'max_uid', fallback=65545))
 
     uids = frozenset(user.pw_uid for user in getpwall())
 
@@ -99,8 +103,12 @@ def get_uid(pool: range = UID_POOL) -> int:
     raise IdentifiersExhausted('UIDs exhausted.')
 
 
-def get_gid(pool: range = GID_POOL) -> int:
+def get_gid(*, pool: Optional[range] = None) -> int:
     """Returns a unique, unassigned group ID."""
+
+    if pool is None:
+        pool = range(CONFIG.getint('group', 'min_gid', fallback=2000),
+                     CONFIG.getint('group', 'max_gid', fallback=65545))
 
     gids = frozenset(group.gr_gid for group in getgrall())
 
