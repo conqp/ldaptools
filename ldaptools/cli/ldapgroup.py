@@ -1,23 +1,19 @@
 """LDAP group CLI."""
 
-from argparse import ArgumentParser
-from logging import INFO, basicConfig, getLogger
-from sys import argv
+from argparse import ArgumentParser, Namespace, _SubParsersAction
+from logging import INFO, basicConfig
 
-from ldaptools.cli import LOG_FORMAT
 from ldaptools.config import CONFIG
 from ldaptools.functions import ldapadd, ldapmodify
 from ldaptools.group import create, modify, add, remove
 from ldaptools.ldif import DistinguishedName
+from ldaptools.logging import LOG_FORMAT, LOGGER
 
 
 __all__ = ['main']
 
 
-LOGGER = getLogger(argv[0])
-
-
-def _add_parser_add_group(subparsers):
+def _add_parser_add_group(subparsers: _SubParsersAction) -> None:
     """Adds a parser for adding groups."""
 
     parser = subparsers.add_parser('add', help='add a group')
@@ -25,14 +21,14 @@ def _add_parser_add_group(subparsers):
     parser.add_argument('member', nargs='*', help='a group member')
 
 
-def _add_parser_modify_group(subparsers):
+def _add_parser_modify_group(subparsers: _SubParsersAction) -> None:
     """Adds a parser for adding groups."""
 
     parser = subparsers.add_parser('modify', help='modify a group')
     parser.add_argument('group', help="the group's name")
 
 
-def _add_parser_add_member(subparsers):
+def _add_parser_add_member(subparsers: _SubParsersAction) -> None:
     """Adds a parser for adding members to a group."""
 
     parser = subparsers.add_parser('add-member', help='add a member to a group')
@@ -40,7 +36,7 @@ def _add_parser_add_member(subparsers):
     parser.add_argument('member', nargs='+', help='a group member')
 
 
-def _add_parser_remove_member(subparsers):
+def _add_parser_remove_member(subparsers: _SubParsersAction) -> None:
     """Adds a parser to delete a user."""
 
     parser = subparsers.add_parser(
@@ -49,7 +45,7 @@ def _add_parser_remove_member(subparsers):
     parser.add_argument('member', nargs='+', help='a group member')
 
 
-def get_args():
+def get_args() -> Namespace:
     """Returns the CLI arguments."""
 
     parser = ArgumentParser(description='Manage LDAP groups and members.')
@@ -64,7 +60,8 @@ def get_args():
     return parser.parse_args()
 
 
-def _add(args):
+# pylint: disable=C0103
+def _add(args: Namespace) -> None:
     """Adds an LDAP group."""
 
     ou = args.ou or CONFIG['group']['ou']
@@ -74,7 +71,7 @@ def _add(args):
     ldapadd(master, ldif)
 
 
-def _modify(args):
+def _modify(args: Namespace) -> None:
     """Modifies an LDAP group."""
 
     ou = args.ou or CONFIG['group']['ou']
@@ -84,7 +81,7 @@ def _modify(args):
     ldapmodify(master, ldif)
 
 
-def _add_member(args):
+def _add_member(args: Namespace) -> None:
     """Adds a member to an LDAP group."""
 
     ou = args.ou or CONFIG['group']['ou']
@@ -96,7 +93,7 @@ def _add_member(args):
         ldapmodify(master, ldif)
 
 
-def _remove_member(args):
+def _remove_member(args: Namespace) -> None:
     """Removes a member from an LDAP group."""
 
     ou = args.ou or CONFIG['group']['ou']
@@ -108,7 +105,7 @@ def _remove_member(args):
         ldapmodify(master, ldif)
 
 
-def main():
+def main() -> None:
     """Main function."""
 
     args = get_args()

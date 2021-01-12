@@ -1,16 +1,19 @@
 """Group LDIFs."""
 
+from typing import Iterable, Iterator, Optional
+
 from ldaptools.config import CONFIG
+from ldaptools.functions import stripped_str_set
 from ldaptools.ldif import DistinguishedName, DNComponent, LDIF, LDIFEntry
 
 
-CLASSES = tuple(filter(None, map(
-    lambda item: item.strip(), CONFIG['group']['classes'].split(','))))
-DOMAIN = CONFIG['common']['domain']
-OU = CONFIG['group']['ou']
+CLASSES = stripped_str_set(CONFIG.get('group', 'classes', fallback=''))
+DOMAIN = CONFIG.get('common', 'domain', fallback=None)
+OU = CONFIG.get('group', 'ou', fallback=None)
 
 
-def get_dn(dn, name):   # pylint: disable=C0103
+# pylint: disable=C0103
+def get_dn(dn: str, name: str) -> DistinguishedName:
     """Returns a distinguished name with group name and ou information."""
 
     dn = DistinguishedName(dn)
@@ -20,7 +23,8 @@ def get_dn(dn, name):   # pylint: disable=C0103
 
 
 @LDIF.constructor
-def create(name, gid, members, *, ou=OU, domain=DOMAIN):
+def create(name: str, gid: int, members: Iterable[str], *,
+           ou: str = OU, domain: str = DOMAIN) -> Iterator[LDIFEntry]:
     """Creates a new group LDIF."""
 
     dn = DistinguishedName.for_group(name, domain, ou=ou)
@@ -36,7 +40,9 @@ def create(name, gid, members, *, ou=OU, domain=DOMAIN):
 
 
 @LDIF.constructor
-def modify(name, new_name=None, gid=None, *, ou=OU, domain=DOMAIN):
+def modify(name: str, new_name: Optional[str] = None,
+           gid: Optional[int] = None, *, ou: str = OU,
+           domain: str = DOMAIN) -> Iterator[LDIFEntry]:
     """Modifies an existing group."""
 
     dn = DistinguishedName.for_group(name, domain, ou=ou)
@@ -53,7 +59,8 @@ def modify(name, new_name=None, gid=None, *, ou=OU, domain=DOMAIN):
 
 
 @LDIF.constructor
-def add(name, member, *, ou=OU, domain=DOMAIN):
+def add(name: str, member: str, *, ou: str = OU,
+        domain: str = DOMAIN) -> Iterator[LDIFEntry]:
     """Adds a member to the group."""
 
     dn = DistinguishedName.for_group(name, domain, ou=ou)
@@ -64,7 +71,8 @@ def add(name, member, *, ou=OU, domain=DOMAIN):
 
 
 @LDIF.constructor
-def remove(name, member, *, ou=OU, domain=DOMAIN):
+def remove(name: str, member: str, *, ou: str = OU,
+           domain: str = DOMAIN) -> Iterator[LDIFEntry]:
     """Adds a member to the group."""
 
     dn = DistinguishedName.for_group(name, domain, ou=ou)

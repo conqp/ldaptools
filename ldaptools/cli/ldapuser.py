@@ -1,23 +1,19 @@
 """LDAP user CLI."""
 
-from argparse import ArgumentParser
-from logging import INFO, basicConfig, getLogger
-from sys import argv
+from argparse import ArgumentParser, Namespace, _SubParsersAction
+from logging import INFO, basicConfig
 
-from ldaptools.cli import LOG_FORMAT
 from ldaptools.config import CONFIG
 from ldaptools.functions import ldapadd, ldapmodify, ldapdelete, genpw
 from ldaptools.user import create, modify, delete
 from ldaptools.ldif import DistinguishedName
+from ldaptools.logging import LOG_FORMAT, LOGGER
 
 
 __all__ = ['main']
 
 
-LOGGER = getLogger(argv[0])
-
-
-def _add_parser_add_user(subparsers):
+def _add_parser_add_user(subparsers: _SubParsersAction) -> None:
     """Adds a parser for adding users."""
 
     parser = subparsers.add_parser('add', help='add a user')
@@ -26,7 +22,7 @@ def _add_parser_add_user(subparsers):
     parser.add_argument('last_name', help="the user's last name")
 
 
-def _add_parser_modify_user(subparsers):
+def _add_parser_modify_user(subparsers: _SubParsersAction) -> None:
     """Adds a parser for modifying users."""
 
     parser = subparsers.add_parser('modify', help='modify a user')
@@ -35,14 +31,14 @@ def _add_parser_modify_user(subparsers):
     parser.add_argument('last_name', nargs='?', help="the user's last name")
 
 
-def _add_parser_delete_user(subparsers):
+def _add_parser_delete_user(subparsers: _SubParsersAction) -> None:
     """Adds a parser to delete a user."""
 
     parser = subparsers.add_parser('delete', help='delete a user')
     parser.add_argument('user_name', help='the user name')
 
 
-def get_args():
+def get_args() -> Namespace:
     """Returns the CLI arguments."""
 
     parser = ArgumentParser(description='Manage LDAP users.')
@@ -60,7 +56,8 @@ def get_args():
     return parser.parse_args()
 
 
-def _add(args):
+# pylint: disable=C0103
+def _add(args: Namespace) -> None:
     """Adds an LDAP user."""
 
     shell = args.shell or CONFIG['user']['shell']
@@ -75,27 +72,28 @@ def _add(args):
         LOGGER.info('Generated password: %s', passwd)
 
     ldif = create(
-        args.user_name, args.first_name, args.last_name, passwd=passwd,
-        uid=args.uid, gid=args.gid, home=home, shell=shell, ou=ou,
-        domain=domain)
+        args.user_name, args.first_name, args.last_name,
+        passwd=passwd, uid=args.uid, gid=args.gid, home=home, shell=shell,
+        ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
 
 
-def _modify(args):
+def _modify(args: Namespace) -> None:
     """Modifies an LDAP user."""
 
     ou = args.ou or CONFIG['user']['ou']
     domain = args.domain or CONFIG['common']['domain']
     ldif = modify(
-        args.user_name, first_name=args.first_name, last_name=args.last_name,
+        args.user_name,
+        first_name=args.first_name, last_name=args.last_name,
         passwd=args.passwd, uid=args.uid, gid=args.gid, home=args.home,
         shell=args.shell, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
 
 
-def _delete(args):
+def _delete(args: Namespace) -> None:
     """Deletes the respective user."""
 
     ou = args.ou or CONFIG['user']['ou']
@@ -105,7 +103,7 @@ def _delete(args):
     ldapdelete(master, dn)
 
 
-def main():
+def main() -> None:
     """Main function."""
 
     args = get_args()
