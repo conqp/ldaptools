@@ -64,8 +64,8 @@ def get_args() -> Namespace:
 def _add(args: Namespace) -> None:
     """Adds an LDAP group."""
 
-    ou = args.ou or CONFIG['group']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('group', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
     ldif = create(args.group, args.gid, args.member, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
@@ -74,8 +74,8 @@ def _add(args: Namespace) -> None:
 def _modify(args: Namespace) -> None:
     """Modifies an LDAP group."""
 
-    ou = args.ou or CONFIG['group']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('group', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
     ldif = modify(args.group, gid=args.gid, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
@@ -84,8 +84,8 @@ def _modify(args: Namespace) -> None:
 def _add_member(args: Namespace) -> None:
     """Adds a member to an LDAP group."""
 
-    ou = args.ou or CONFIG['group']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('group', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
 
     for member in args.member:
         ldif = add(args.group, member, ou=ou, domain=domain)
@@ -96,8 +96,8 @@ def _add_member(args: Namespace) -> None:
 def _remove_member(args: Namespace) -> None:
     """Removes a member from an LDAP group."""
 
-    ou = args.ou or CONFIG['group']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('group', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
 
     for member in args.member:
         ldif = remove(args.group, member, ou=ou, domain=domain)

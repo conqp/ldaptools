@@ -60,10 +60,10 @@ def get_args() -> Namespace:
 def _add(args: Namespace) -> None:
     """Adds an LDAP user."""
 
-    shell = args.shell or CONFIG['user']['shell']
-    home = args.home or CONFIG['user']['home']
-    ou = args.ou or CONFIG['user']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    shell = args.shell or CONFIG.get('user', 'shell')
+    home = args.home or CONFIG.get('user', 'home')
+    ou = args.ou or CONFIG.get('user', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
 
     if args.passwd:
         passwd = args.passwd
@@ -82,8 +82,8 @@ def _add(args: Namespace) -> None:
 def _modify(args: Namespace) -> None:
     """Modifies an LDAP user."""
 
-    ou = args.ou or CONFIG['user']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('user', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
     ldif = modify(
         args.user_name,
         first_name=args.first_name, last_name=args.last_name,
@@ -96,8 +96,8 @@ def _modify(args: Namespace) -> None:
 def _delete(args: Namespace) -> None:
     """Deletes the respective user."""
 
-    ou = args.ou or CONFIG['user']['ou']
-    domain = args.domain or CONFIG['common']['domain']
+    ou = args.ou or CONFIG.get('user', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
     dn = delete(args.user_name, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapdelete(master, dn)
