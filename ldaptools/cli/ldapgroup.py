@@ -4,8 +4,8 @@ from argparse import ArgumentParser, Namespace, _SubParsersAction
 from logging import INFO, basicConfig
 
 from ldaptools.config import CONFIG, CONFIG_FILE
-from ldaptools.functions import ldapadd, ldapmodify
-from ldaptools.group import create, modify, add, remove
+from ldaptools.functions import ldapadd, ldapdelete, ldapmodify
+from ldaptools.group import add, create, delete, modify, remove
 from ldaptools.ldif import DistinguishedName
 from ldaptools.logging import LOG_FORMAT, LOGGER
 
@@ -37,12 +37,19 @@ def _add_parser_add_member(subparsers: _SubParsersAction) -> None:
 
 
 def _add_parser_remove_member(subparsers: _SubParsersAction) -> None:
-    """Adds a parser to delete a user."""
+    """Adds a parser to delete a user from the group."""
 
     parser = subparsers.add_parser(
         'remove-member', help='remove a member from a group')
     parser.add_argument('group', help="the group's name")
     parser.add_argument('member', nargs='+', help='a group member')
+
+
+def _add_parser_delete_group(subparsers: _SubParsersAction) -> None:
+    """Adds a parser to delete a group."""
+
+    parser = subparsers.add_parser('delete', help='delete a group')
+    parser.add_argument('group', help="the group's name")
 
 
 def get_args() -> Namespace:
@@ -57,6 +64,7 @@ def get_args() -> Namespace:
     _add_parser_modify_group(subparsers)
     _add_parser_add_member(subparsers)
     _add_parser_remove_member(subparsers)
+    _add_parser_delete_group(subparsers)
     return parser.parse_args()
 
 
@@ -105,6 +113,16 @@ def _remove_member(args: Namespace) -> None:
         ldapmodify(master, ldif)
 
 
+def _delete(args: Namespace) -> None:
+    """Deletes the respective user."""
+
+    ou = args.ou or CONFIG.get('user', 'ou')
+    domain = args.domain or CONFIG.get('common', 'domain')
+    dn = delete(args.group, ou=ou, domain=domain)
+    master = DistinguishedName.for_master(domain)
+    ldapdelete(master, dn)
+
+
 def main() -> None:
     """Main function."""
 
@@ -120,5 +138,7 @@ def main() -> None:
         _add_member(args)
     elif args.action == 'remove-member':
         _remove_member(args)
+    elif args.action == 'delete':
+        _delete(args)
     else:
         LOGGER.error('No action specified.')

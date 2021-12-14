@@ -88,3 +88,11 @@ def remove(name: str, member: str, *, ou: Optional[str] = None,
     yield LDIFEntry('changetype', 'modify')
     yield LDIFEntry('delete', 'memberUid')
     yield LDIFEntry('memberUid', member)
+
+
+def delete(name: str, *, ou: Optional[str] = None,
+           domain: Optional[str] = None) -> DistinguishedName:
+    """Removes a member from the group."""
+
+    ou, domain = with_fallback(ou, domain)
+    return DistinguishedName.for_group(name, domain, ou=ou)
