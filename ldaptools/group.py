@@ -27,8 +27,8 @@ def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
 
 @LDIF.constructor
 def create(name: str, gid: int, members: Iterable[str], *,
-           ou: Optional[str] = None, domain: Optional[str] = str) \
-           -> Iterator[LDIFEntry]:
+           ou: Optional[str] = None,
+           domain: Optional[str] = str) -> Iterator[LDIFEntry]:
     """Creates a new group LDIF."""
 
     ou, domain = with_fallback(ou, domain)
