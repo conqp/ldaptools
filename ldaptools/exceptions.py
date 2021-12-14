@@ -6,7 +6,7 @@ __all__ = ['InvalidName', 'IdentifiersExhausted']
 class InvalidName(ValueError):
     """Indicates that an invalid name has been specified."""
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         """Sets the invalid name."""
         super().__init__(name)
         self.name = name
