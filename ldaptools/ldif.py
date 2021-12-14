@@ -8,7 +8,7 @@ from typing import Callable, Iterator, NamedTuple, Optional
 from ldaptools.config import CONFIG
 
 
-__all__ = ['DistinguishedName', 'DNComponent', 'LDIF', 'LDIFEntry']
+__all__ = ['DistinguishedName', 'DNComponent', 'LDIFEntry', 'LDIF']
 
 
 # pylint: disable=C0103
