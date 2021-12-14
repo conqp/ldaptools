@@ -80,7 +80,7 @@ def add(name: str, member: str, *, ou: Optional[str] = None,
 @LDIF.constructor
 def remove(name: str, member: str, *, ou: Optional[str] = None,
            domain: Optional[str] = None) -> Iterator[LDIFEntry]:
-    """Adds a member to the group."""
+    """Removes a member from the group."""
 
     ou, domain = with_fallback(ou, domain)
     dn = DistinguishedName.for_group(name, domain, ou=ou)
