@@ -2,7 +2,7 @@
 
 from grp import getgrall
 from pwd import getpwall
-from random import choices
+from secrets import choice
 from string import ascii_letters, digits
 from subprocess import CompletedProcess, check_output, run
 from tempfile import NamedTemporaryFile
@@ -84,7 +84,7 @@ def ldapdelete(master: DistinguishedName, dn: DistinguishedName) \
 def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
     """Generates a unique random password."""
 
-    return ''.join(choices(pool, k=length))
+    return ''.join(choice(pool) for _ in range(length))
 
 
 def get_uid(*, pool: Optional[range] = None) -> int:
