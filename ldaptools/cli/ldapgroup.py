@@ -116,7 +116,7 @@ def _remove_member(args: Namespace) -> None:
 def _delete(args: Namespace) -> None:
     """Deletes the respective user."""
 
-    ou = args.ou or CONFIG.get('user', 'ou')
+    ou = args.ou or CONFIG.get('group', 'ou')
     domain = args.domain or CONFIG.get('common', 'domain')
     dn = delete(args.group, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
