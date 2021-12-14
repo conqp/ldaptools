@@ -3,7 +3,7 @@
 from __future__ import annotations
 from functools import wraps
 from os import linesep
-from typing import Iterator, NamedTuple, Optional
+from typing import Callable, Iterator, NamedTuple, Optional
 
 from ldaptools.config import CONFIG
 
@@ -64,6 +64,16 @@ class DNComponent(NamedTuple):
         return f'{self.key}={self.value}'
 
 
+class LDIFEntry(NamedTuple):
+    """An LDIF file's entry."""
+
+    key: str
+    value: str
+
+    def __str__(self):
+        return f'{self.key}: {self.value}'
+
+
 class LDIF(list):
     """An LDIF file, containing key-value pairs."""
 
@@ -71,7 +81,7 @@ class LDIF(list):
         return linesep.join(str(entry) for entry in self)
 
     @classmethod
-    def constructor(cls, function):
+    def constructor(cls, function:Callable[..., Iterator[LDIFEntry]]):
         """Decorator to create an LDIF instance
         from the return values of a function.
         """
@@ -82,13 +92,3 @@ class LDIF(list):
 
         function.__annotations__['return'] = cls
         return wrapper
-
-
-class LDIFEntry(NamedTuple):
-    """An LDIF file's entry."""
-
-    key: str
-    value: str
-
-    def __str__(self):
-        return f'{self.key}: {self.value}'
