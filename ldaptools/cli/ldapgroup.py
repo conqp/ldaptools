@@ -66,7 +66,7 @@ def _add(args: Namespace) -> None:
 
     ou = args.ou or CONFIG['group']['ou']
     domain = args.domain or CONFIG['common']['domain']
-    ldif = create(args.name, args.gid, args.member, ou=ou, domain=domain)
+    ldif = create(args.group, args.gid, args.member, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
 
@@ -76,7 +76,7 @@ def _modify(args: Namespace) -> None:
 
     ou = args.ou or CONFIG['group']['ou']
     domain = args.domain or CONFIG['common']['domain']
-    ldif = modify(args.name, gid=args.gid, ou=ou, domain=domain)
+    ldif = modify(args.group, gid=args.gid, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
 
