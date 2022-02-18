@@ -31,12 +31,20 @@ def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
 
 
 @LDIF.constructor
-def create(name: str, first_name: str, last_name: str, *,
-           passwd: Optional[str] = None, pwhash: Optional[str] = None,
-           uid: Optional[int] = None, gid: Optional[int] = None,
-           home: Optional[str] = None, shell: Optional[str] = None,
-           ou: Optional[str] = None, domain: Optional[str] = None) \
-           -> Iterator[LDIFEntry]:
+def create(
+        name: str,
+        first_name: str,
+        last_name: str,
+        *,
+        passwd: Optional[str] = None,
+        pwhash: Optional[str] = None,
+        uid: Optional[int] = None,
+        gid: Optional[int] = None,
+        home: Optional[str] = None,
+        shell: Optional[str] = None,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> Iterator[LDIFEntry]:
     """Creates an LDIF represeting a new user."""
 
     ou, domain = with_fallback(ou, domain)
@@ -71,13 +79,21 @@ def create(name: str, first_name: str, last_name: str, *,
 
 
 @LDIF.constructor
-def modify(name: str, *, new_name: Optional[str] = None,
-           uid: Optional[int] = None, gid: Optional[int] = None,
-           first_name: Optional[str] = None, last_name: Optional[str] = None,
-           passwd: Optional[str] = None, pwhash: Optional[str] = None,
-           home: Optional[str] = None, shell: Optional[str] = None,
-           ou: Optional[str] = None,
-           domain: Optional[str] = None) -> Iterator[LDIFEntry]:
+def modify(
+        name: str,
+        *,
+        new_name: Optional[str] = None,
+        uid: Optional[int] = None,
+        gid: Optional[int] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
+        passwd: Optional[str] = None,
+        pwhash: Optional[str] = None,
+        home: Optional[str] = None,
+        shell: Optional[str] = None,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> Iterator[LDIFEntry]:
     """Creates an LDIF to modify a user."""
 
     ou, domain = with_fallback(ou, domain)
@@ -129,8 +145,12 @@ def modify(name: str, *, new_name: Optional[str] = None,
         yield LDIFEntry('homeDirectory', home)
 
 
-def delete(name: str, *, ou: Optional[str] = None,
-           domain: Optional[str] = None) -> DistinguishedName:
+def delete(
+        name: str,
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> DistinguishedName:
     """Creates an LDIF to delete a user."""
 
     ou, domain = with_fallback(ou, domain)
