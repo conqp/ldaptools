@@ -17,6 +17,7 @@ __all__ = [
     'classes',
     'slappasswd',
     'ldapadd',
+    'ldapdelete',
     'ldapmodify',
     'genpw',
     'get_uid',
