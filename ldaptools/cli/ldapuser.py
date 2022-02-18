@@ -56,7 +56,6 @@ def get_args() -> Namespace:
     return parser.parse_args()
 
 
-# pylint: disable=C0103
 def _add(args: Namespace) -> None:
     """Adds an LDAP user."""
 
