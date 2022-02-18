@@ -40,7 +40,8 @@ def _add_parser_remove_member(subparsers: _SubParsersAction) -> None:
     """Adds a parser to delete a user from the group."""
 
     parser = subparsers.add_parser(
-        'remove-member', help='remove a member from a group')
+        'remove-member', help='remove a member from a group'
+    )
     parser.add_argument('group', help="the group's name")
     parser.add_argument('member', nargs='+', help='a group member')
 

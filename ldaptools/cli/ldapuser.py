@@ -73,7 +73,8 @@ def _add(args: Namespace) -> None:
     ldif = create(
         args.user_name, args.first_name, args.last_name,
         passwd=passwd, uid=args.uid, gid=args.gid, home=home, shell=shell,
-        ou=ou, domain=domain)
+        ou=ou, domain=domain
+    )
     master = DistinguishedName.for_master(domain)
     ldapadd(master, ldif)
 
@@ -87,7 +88,8 @@ def _modify(args: Namespace) -> None:
         args.user_name,
         first_name=args.first_name, last_name=args.last_name,
         passwd=args.passwd, uid=args.uid, gid=args.gid, home=args.home,
-        shell=args.shell, ou=ou, domain=domain)
+        shell=args.shell, ou=ou, domain=domain
+    )
     master = DistinguishedName.for_master(domain)
     ldapmodify(master, ldif)
 
