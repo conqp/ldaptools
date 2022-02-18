@@ -92,8 +92,10 @@ def get_uid(*, pool: Optional[range] = None) -> int:
     """Returns a unique, unassigned user ID."""
 
     if pool is None:
-        pool = range(CONFIG.getint('user', 'min_uid', fallback=2000),
-                     CONFIG.getint('user', 'max_uid', fallback=65545))
+        pool = range(
+            CONFIG.getint('user', 'min_uid', fallback=2000),
+            CONFIG.getint('user', 'max_uid', fallback=65545)
+        )
 
     uids = frozenset(user.pw_uid for user in getpwall())
 
@@ -108,8 +110,10 @@ def get_gid(*, pool: Optional[range] = None) -> int:
     """Returns a unique, unassigned group ID."""
 
     if pool is None:
-        pool = range(CONFIG.getint('group', 'min_gid', fallback=2000),
-                     CONFIG.getint('group', 'max_gid', fallback=65545))
+        pool = range(
+            CONFIG.getint('group', 'min_gid', fallback=2000),
+            CONFIG.getint('group', 'max_gid', fallback=65545)
+        )
 
     gids = frozenset(group.gr_gid for group in getgrall())
 
