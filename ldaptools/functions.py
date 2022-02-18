@@ -73,8 +73,9 @@ def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
 
 
 # pylint: disable=C0103
-def ldapdelete(master: DistinguishedName, dn: DistinguishedName) \
-                -> CompletedProcess:
+def ldapdelete(
+        master: DistinguishedName, dn: DistinguishedName
+) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
     binary = CONFIG.get('binaries', 'ldapdelete', fallback=LDAPDELETE)
@@ -119,8 +120,11 @@ def get_gid(*, pool: Optional[range] = None) -> int:
     raise IdentifiersExhausted('GIDs exhausted.')
 
 
-def get_pwhash(*, passwd: Optional[str] = None,
-               pwhash: Optional[str] = None) -> str:
+def get_pwhash(
+        *,
+        passwd: Optional[str] = None,
+        pwhash: Optional[str] = None
+) -> str:
     """Returns the respective password hash."""
 
     if passwd is not None and pwhash is None:

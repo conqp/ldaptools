@@ -1,6 +1,7 @@
 """LDIF file models."""
 
 from __future__ import annotations
+from contextlib import suppress
 from functools import partial, wraps
 from os import linesep
 from typing import Callable, Iterator, NamedTuple, Optional
