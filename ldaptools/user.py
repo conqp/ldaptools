@@ -45,7 +45,7 @@ def create(
         ou: Optional[str] = None,
         domain: Optional[str] = None
 ) -> Iterator[LDIFEntry]:
-    """Creates an LDIF represeting a new user."""
+    """Creates an LDIF representing a new user."""
 
     ou, domain = with_fallback(ou, domain)
     dn = DistinguishedName.for_user(name, domain, ou=ou)
