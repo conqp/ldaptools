@@ -84,7 +84,7 @@ class LDIF(list):
         return linesep.join(str(entry) for entry in self)
 
     @classmethod
-    def constructor(cls, function:Callable[..., Iterator[LDIFEntry]]):
+    def constructor(cls, function: Callable[..., Iterator[LDIFEntry]]):
         """Decorator to create an LDIF instance
         from the return values of a function.
         """
