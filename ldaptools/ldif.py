@@ -15,9 +15,8 @@ __all__ = ['DistinguishedName', 'DNComponent', 'LDIFEntry', 'LDIF']
 def domain_components(domain: str) -> Iterator[DNComponent]:
     """Yields domain components."""
 
-    for domain_component in domain.split('.'):
-        if domain_component:
-            yield DNComponent('dc', domain_component)
+    for domain_component in filter(None, domain.split('.')):
+        yield DNComponent('dc', domain_component)
 
 
 class DistinguishedName(list):
