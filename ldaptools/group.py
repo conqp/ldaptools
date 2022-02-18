@@ -7,7 +7,6 @@ from ldaptools.functions import classes
 from ldaptools.ldif import DistinguishedName, DNComponent, LDIF, LDIFEntry
 
 
-# pylint: disable=C0103
 def get_dn(dn: str, name: str) -> DistinguishedName:
     """Returns a distinguished name with group name and ou information."""
 
