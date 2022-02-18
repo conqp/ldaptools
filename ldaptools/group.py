@@ -28,9 +28,14 @@ def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
 
 
 @LDIF.constructor
-def create(name: str, gid: int, members: Iterable[str], *,
-           ou: Optional[str] = None,
-           domain: Optional[str] = str) -> Iterator[LDIFEntry]:
+def create(
+        name: str,
+        gid: int,
+        members: Iterable[str],
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = str
+) -> Iterator[LDIFEntry]:
     """Creates a new group LDIF."""
 
     ou, domain = with_fallback(ou, domain)
@@ -47,9 +52,14 @@ def create(name: str, gid: int, members: Iterable[str], *,
 
 
 @LDIF.constructor
-def modify(name: str, new_name: Optional[str] = None,
-           gid: Optional[int] = None, *, ou: Optional[str] = None,
-           domain: Optional[str] = None) -> Iterator[LDIFEntry]:
+def modify(
+        name: str,
+        new_name: Optional[str] = None,
+        gid: Optional[int] = None,
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> Iterator[LDIFEntry]:
     """Modifies an existing group."""
 
     ou, domain = with_fallback(ou, domain)
@@ -67,8 +77,13 @@ def modify(name: str, new_name: Optional[str] = None,
 
 
 @LDIF.constructor
-def add(name: str, member: str, *, ou: Optional[str] = None,
-        domain: Optional[str] = None) -> Iterator[LDIFEntry]:
+def add(
+        name: str,
+        member: str,
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> Iterator[LDIFEntry]:
     """Adds a member to the group."""
 
     ou, domain = with_fallback(ou, domain)
@@ -80,8 +95,13 @@ def add(name: str, member: str, *, ou: Optional[str] = None,
 
 
 @LDIF.constructor
-def remove(name: str, member: str, *, ou: Optional[str] = None,
-           domain: Optional[str] = None) -> Iterator[LDIFEntry]:
+def remove(
+        name: str,
+        member: str,
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> Iterator[LDIFEntry]:
     """Removes a member from the group."""
 
     ou, domain = with_fallback(ou, domain)
@@ -92,8 +112,12 @@ def remove(name: str, member: str, *, ou: Optional[str] = None,
     yield LDIFEntry('memberUid', member)
 
 
-def delete(name: str, *, ou: Optional[str] = None,
-           domain: Optional[str] = None) -> DistinguishedName:
+def delete(
+        name: str,
+        *,
+        ou: Optional[str] = None,
+        domain: Optional[str] = None
+) -> DistinguishedName:
     """Removes a member from the group."""
 
     ou, domain = with_fallback(ou, domain)
