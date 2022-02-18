@@ -10,7 +10,6 @@ from ldaptools.ldif import DistinguishedName, LDIF, LDIFEntry
 __all__ = ['create', 'modify']
 
 
-# pylint: disable=C0103
 def get_cn(first_name: str, last_name: str) -> Optional[str]:
     """Returns the respective common name."""
 
