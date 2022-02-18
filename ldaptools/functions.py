@@ -1,6 +1,7 @@
 """Miscellaneous functions."""
 
 from grp import getgrall
+from pathlib import Path
 from pwd import getpwall
 from secrets import choice
 from string import ascii_letters, digits
@@ -47,7 +48,9 @@ def slappasswd(passwd: str) -> str:
     return check_output([binary, '-s', passwd], text=True).strip()
 
 
-def ldapadd(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
+def ldapadd(
+        master: DistinguishedName, ldif: LDIF | Path | str
+) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
@@ -57,10 +60,12 @@ def ldapadd(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
             return ldapadd(master, tmp.name)
 
     binary = CONFIG.get('binaries', 'ldapadd', fallback=LDAPADD)
-    return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
+    return run([binary, '-D', str(master), '-W', '-f', str(ldif)], check=True)
 
 
-def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
+def ldapmodify(
+        master: DistinguishedName, ldif: LDIF | Path | str
+) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
     if isinstance(ldif, LDIF):
@@ -70,7 +75,7 @@ def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
             return ldapmodify(master, tmp.name)
 
     binary = CONFIG.get('binaries', 'ldapmodify', fallback=LDAPMODIFY)
-    return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
+    return run([binary, '-D', str(master), '-W', '-f', str(ldif)], check=True)
 
 
 def ldapdelete(
