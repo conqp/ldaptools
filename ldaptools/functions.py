@@ -56,7 +56,7 @@ def ldapadd(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
             tmp.flush()
             return ldapadd(master, tmp.name)
 
-    binary = CONFIG.get('binaries','ldapadd', fallback=LDAPADD)
+    binary = CONFIG.get('binaries', 'ldapadd', fallback=LDAPADD)
     return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
 
 
