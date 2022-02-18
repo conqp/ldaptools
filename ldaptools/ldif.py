@@ -11,7 +11,6 @@ from ldaptools.config import CONFIG
 __all__ = ['DistinguishedName', 'DNComponent', 'LDIFEntry', 'LDIF']
 
 
-# pylint: disable=C0103
 def domain_components(domain: str) -> Iterator[DNComponent]:
     """Yields domain components."""
 
