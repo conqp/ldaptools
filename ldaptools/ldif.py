@@ -3,7 +3,7 @@
 from __future__ import annotations
 from functools import partial, wraps
 from os import linesep
-from typing import Callable, Iterator, NamedTuple, Optional
+from typing import Any, Callable, Iterator, NamedTuple, Optional
 
 from ldaptools.config import CONFIG
 
@@ -71,7 +71,7 @@ class LDIFEntry(NamedTuple):
     """An LDIF file's entry."""
 
     key: str
-    value: str
+    value: Any
 
     def __str__(self):
         return f'{self.key}: {self.value}'
