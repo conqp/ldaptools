@@ -25,9 +25,10 @@ def get_cn(first_name: str, last_name: str) -> Optional[str]:
 def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
     """Returns the OU and domain with fallback values from the config."""
 
-    ou = CONFIG.get('user', 'ou') if ou is None else ou
-    domain = CONFIG.get('common', 'domain') if domain is None else domain
-    return (ou, domain)
+    return (
+        CONFIG.get('user', 'ou') if ou is None else ou,
+        CONFIG.get('common', 'domain') if domain is None else domain
+    )
 
 
 @LDIF.constructor
