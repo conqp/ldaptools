@@ -7,6 +7,9 @@ from ldaptools.functions import classes
 from ldaptools.ldif import DistinguishedName, DNComponent, LDIF, LDIFEntry
 
 
+__all__ = ['create', 'modify', 'add', 'remove', 'delete']
+
+
 def get_dn(dn: str, name: str) -> DistinguishedName:
     """Returns a distinguished name with group name and ou information."""
 
