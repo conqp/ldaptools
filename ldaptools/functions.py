@@ -72,7 +72,6 @@ def ldapmodify(master: DistinguishedName, ldif: LDIF) -> CompletedProcess:
     return run([binary, '-D', str(master), '-W', '-f', ldif], check=True)
 
 
-# pylint: disable=C0103
 def ldapdelete(
         master: DistinguishedName, dn: DistinguishedName
 ) -> CompletedProcess:
