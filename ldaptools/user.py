@@ -7,7 +7,7 @@ from ldaptools.functions import classes, get_uid, get_gid, get_pwhash
 from ldaptools.ldif import DistinguishedName, LDIF, LDIFEntry
 
 
-__all__ = ['create', 'modify']
+__all__ = ['create', 'modify', 'delete']
 
 
 def get_cn(first_name: str, last_name: str) -> Optional[str]:
