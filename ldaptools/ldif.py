@@ -1,7 +1,7 @@
 """LDIF file models."""
 
 from __future__ import annotations
-from functools import wraps
+from functools import partial, wraps
 from os import linesep
 from typing import Callable, Iterator, NamedTuple, Optional
 
@@ -15,8 +15,7 @@ __all__ = ['DistinguishedName', 'DNComponent', 'LDIFEntry', 'LDIF']
 def domain_components(domain: str) -> Iterator[DNComponent]:
     """Yields domain components."""
 
-    for domain_component in filter(None, domain.split('.')):
-        yield DNComponent('dc', domain_component)
+    return map(partial(DNComponent, 'dc'), filter(None, domain.split('.')))
 
 
 class DistinguishedName(list):
