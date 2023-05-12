@@ -26,35 +26,49 @@ class DistinguishedName(list):
 
     @classmethod
     def for_user(
-            cls, uid: str, domain: str, *,
+            cls,
+            uid: str,
+            domain: str,
+            *,
             ou: Optional[str] = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a user."""
-        ou = CONFIG.get('user', 'ou') if ou is None else ou
-        uid = DNComponent('uid', uid)
-        ou = DNComponent('ou', ou)
-        return cls((uid, ou, *domain_components(domain)))
+        return cls([
+            DNComponent('uid', uid),
+            DNComponent('ou', CONFIG.get('user', 'ou') if ou is None else ou),
+            *domain_components(domain)
+        ])
 
     @classmethod
     def for_group(
-            cls, cn: str, domain: str, *,
+            cls,
+            cn: str,
+            domain: str,
+            *,
             ou: Optional[str] = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a group."""
-        ou = CONFIG.get('group', 'ou') if ou is None else ou
-        cn = DNComponent('cn', cn)
-        ou = DNComponent('ou', ou)
-        return cls((cn, ou, *domain_components(domain)))
+        return cls([
+            DNComponent('cn', cn),
+            DNComponent('ou', CONFIG.get('group', 'ou') if ou is None else ou),
+            *domain_components(domain)
+        ])
 
     @classmethod
     def for_master(
-            cls, domain: str, *,
+            cls,
+            domain: str,
+            *,
             cn: Optional[str] = None
     ) -> DistinguishedName:
         """Creates a distinguished name for administrative operations."""
-        cn = CONFIG.get('common', 'master') if cn is None else cn
-        cn = DNComponent('cn', cn)
-        return cls((cn, *domain_components(domain)))
+        return cls([
+            DNComponent(
+                'cn',
+                CONFIG.get('common', 'master') if cn is None else cn
+            ),
+            *domain_components(domain)
+        ])
 
 
 class DNComponent(NamedTuple):

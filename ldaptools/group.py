@@ -24,7 +24,7 @@ def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
 
     ou = CONFIG.get('group', 'ou') if ou is None else ou
     domain = CONFIG.get('common', 'domain') if domain is None else domain
-    return (ou, domain)
+    return ou, domain
 
 
 @LDIF.constructor

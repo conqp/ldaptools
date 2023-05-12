@@ -44,12 +44,19 @@ def classes(string: Optional[str], *, sep: str = ',') -> set[str]:
 def slappasswd(passwd: str) -> str:
     """Hashes a plain text password for LDIF."""
 
-    binary = CONFIG.get('binaries', 'slappasswd', fallback=SLAPPASSWD)
-    return check_output([binary, '-s', passwd], text=True).strip()
+    return check_output(
+        [
+            CONFIG.get('binaries', 'slappasswd', fallback=SLAPPASSWD),
+            '-s',
+            passwd
+        ],
+        text=True
+    ).strip()
 
 
 def ldapadd(
-        master: DistinguishedName, ldif: LDIF | Path | str
+        master: DistinguishedName,
+        ldif: LDIF | Path | str
 ) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
@@ -59,12 +66,22 @@ def ldapadd(
             tmp.flush()
             return ldapadd(master, tmp.name)
 
-    binary = CONFIG.get('binaries', 'ldapadd', fallback=LDAPADD)
-    return run([binary, '-D', str(master), '-W', '-f', str(ldif)], check=True)
+    return run(
+        [
+            CONFIG.get('binaries', 'ldapadd', fallback=LDAPADD),
+            '-D',
+            str(master),
+            '-W',
+            '-f',
+            str(ldif)
+        ],
+        check=True
+    )
 
 
 def ldapmodify(
-        master: DistinguishedName, ldif: LDIF | Path | str
+        master: DistinguishedName,
+        ldif: LDIF | Path | str
 ) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
@@ -74,17 +91,35 @@ def ldapmodify(
             tmp.flush()
             return ldapmodify(master, tmp.name)
 
-    binary = CONFIG.get('binaries', 'ldapmodify', fallback=LDAPMODIFY)
-    return run([binary, '-D', str(master), '-W', '-f', str(ldif)], check=True)
+    return run(
+        [
+            CONFIG.get('binaries', 'ldapmodify', fallback=LDAPMODIFY),
+            '-D',
+            str(master),
+            '-W',
+            '-f',
+            str(ldif)
+        ],
+        check=True
+    )
 
 
 def ldapdelete(
-        master: DistinguishedName, dn: DistinguishedName
+        master: DistinguishedName,
+        dn: DistinguishedName
 ) -> CompletedProcess:
     """Adds the respective LDIF file."""
 
-    binary = CONFIG.get('binaries', 'ldapdelete', fallback=LDAPDELETE)
-    return run([binary, '-D', str(master), str(dn), '-W'], check=True)
+    return run(
+        [
+            CONFIG.get('binaries', 'ldapdelete', fallback=LDAPDELETE),
+            '-D',
+            str(master),
+            str(dn),
+            '-W'
+        ],
+        check=True
+    )
 
 
 def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
