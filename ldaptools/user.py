@@ -22,15 +22,6 @@ def get_cn(first_name: str, last_name: str) -> Optional[str]:
     raise ValueError('Must specify both, first and last name or neither.')
 
 
-def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
-    """Returns the OU and domain with fallback values from the config."""
-
-    return (
-        CONFIG.get('user', 'ou') if ou is None else ou,
-        CONFIG.get('common', 'domain') if domain is None else domain
-    )
-
-
 @LDIF.constructor
 def create(
         name: str,
@@ -48,35 +39,32 @@ def create(
 ) -> Iterator[LDIFEntry]:
     """Creates an LDIF representing a new user."""
 
-    ou, domain = with_fallback(ou, domain)
-    dn = DistinguishedName.for_user(name, domain, ou=ou)
-    yield LDIFEntry('dn', dn)
+    yield LDIFEntry(
+        'dn', DistinguishedName.for_user(
+            name,
+            CONFIG.get('common', 'domain') if domain is None else domain,
+            ou=CONFIG.get('user', 'ou') if ou is None else ou
+        )
+    )
 
     for clas in classes(CONFIG.get('user', 'classes', fallback=None)):
         yield LDIFEntry('objectClass', clas)
 
     yield LDIFEntry('uid', name)
-    full_name = ' '.join((first_name, last_name))
-    yield LDIFEntry('cn', full_name)
+    yield LDIFEntry('cn', ' '.join((first_name, last_name)))
     yield LDIFEntry('sn', last_name)
     yield LDIFEntry('givenName', first_name)
-    pwhash = get_pwhash(passwd=passwd, pwhash=pwhash)
-    yield LDIFEntry('userPassword', pwhash)
-
-    if shell is None:
-        shell = CONFIG.get('user', 'shell')
-
-    yield LDIFEntry('loginShell', shell)
-    uid = get_uid() if uid is None else uid
-    yield LDIFEntry('uidNumber', uid)
-    gid = get_gid() if gid is None else gid
-    yield LDIFEntry('gidNumber', gid)
-
-    if home is None:
-        home = CONFIG.get('user', 'home')
-
-    home = home.format(name)
-    yield LDIFEntry('homeDirectory', home)
+    yield LDIFEntry('userPassword', get_pwhash(passwd=passwd, pwhash=pwhash))
+    yield LDIFEntry(
+        'loginShell',
+        CONFIG.get('user', 'shell') if shell is None else shell
+    )
+    yield LDIFEntry('uidNumber', get_uid() if uid is None else uid)
+    yield LDIFEntry('gidNumber', get_gid() if gid is None else gid)
+    yield LDIFEntry(
+        'homeDirectory',
+        (CONFIG.get('user', 'home') if home is None else home).format(name)
+    )
 
 
 @LDIF.constructor
@@ -97,18 +85,21 @@ def modify(
 ) -> Iterator[LDIFEntry]:
     """Creates an LDIF to modify a user."""
 
-    ou, domain = with_fallback(ou, domain)
-    dn = DistinguishedName.for_user(name, domain, ou=ou)
-    yield LDIFEntry('dn', dn)
+    yield LDIFEntry(
+        'dn',
+        DistinguishedName.for_user(
+            name,
+            CONFIG.get('common', 'domain') if domain is None else domain,
+            ou=CONFIG.get('user', 'ou') if ou is None else ou
+        )
+    )
     yield LDIFEntry('changetype', 'modify')
 
     if new_name is not None:
         yield LDIFEntry('replace', 'uid')
         yield LDIFEntry('uid', new_name)
 
-    cn = get_cn(first_name, last_name)
-
-    if cn is not None:
+    if cn := get_cn(first_name, last_name):
         yield LDIFEntry('replace', 'cn')
         yield LDIFEntry('cn', cn)
 
@@ -154,5 +145,8 @@ def delete(
 ) -> DistinguishedName:
     """Creates an LDIF to delete a user."""
 
-    ou, domain = with_fallback(ou, domain)
-    return DistinguishedName.for_user(name, domain, ou=ou)
+    return DistinguishedName.for_user(
+        name,
+        CONFIG.get('common', 'domain') if domain is None else domain,
+        ou=CONFIG.get('user', 'ou') if ou is None else ou
+    )
