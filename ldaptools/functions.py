@@ -130,37 +130,27 @@ def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
 def get_gid(*, pool: range | None = None) -> int:
     """Returns a unique, unassigned group ID."""
 
-    if pool is None:
-        pool = range(
+    return _get_unique_identifier(
+        range(
             CONFIG.getint('group', 'min_gid', fallback=2000),
             CONFIG.getint('group', 'max_gid', fallback=65545)
-        )
-
-    gids = frozenset(group.gr_gid for group in getgrall())
-
-    for gid in pool:
-        if gid not in gids:
-            return gid
-
-    raise IdentifiersExhausted('GIDs exhausted.')
+        ) if pool is None else pool,
+        set(group.gr_gid for group in getgrall()),
+        'GID'
+    )
 
 
 def get_uid(*, pool: range | None = None) -> int:
     """Returns a unique, unassigned user ID."""
 
-    if pool is None:
-        pool = range(
+    return _get_unique_identifier(
+        range(
             CONFIG.getint('user', 'min_uid', fallback=2000),
             CONFIG.getint('user', 'max_uid', fallback=65545)
-        )
-
-    uids = frozenset(user.pw_uid for user in getpwall())
-
-    for uid in pool:
-        if uid not in uids:
-            return uid
-
-    raise IdentifiersExhausted('UIDs exhausted.')
+        ) if pool is None else pool,
+        set(user.pw_uid for user in getpwall()),
+        'UID'
+    )
 
 
 def get_pwhash(
@@ -177,3 +167,13 @@ def get_pwhash(
         return pwhash
 
     raise ValueError('Must specify either passwd or pwhash.')
+
+
+def _get_unique_identifier(pool: range, used: set[int], name: str) -> int:
+    """Return a unique identifier from the given pool."""
+
+    for ident in pool:
+        if ident not in used:
+            return ident
+
+    raise IdentifiersExhausted(f'{name}s exhausted.')
