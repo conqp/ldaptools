@@ -1,6 +1,6 @@
 """Group LDIFs."""
 
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator
 
 from ldaptools.config import CONFIG
 from ldaptools.functions import classes
@@ -19,7 +19,7 @@ def get_dn(dn: str, name: str) -> DistinguishedName:
     return dn
 
 
-def with_fallback(ou: Optional[str], domain: Optional[str]) -> tuple[str, str]:
+def with_fallback(ou: str | None, domain: str | None) -> tuple[str, str]:
     """Returns the ou and domain with fallback on defaults from config."""
 
     ou = CONFIG.get('group', 'ou') if ou is None else ou
@@ -33,8 +33,8 @@ def create(
         gid: int,
         members: Iterable[str],
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = str
+        ou: str | None = None,
+        domain: str | None = str
 ) -> Iterator[LDIFEntry]:
     """Creates a new group LDIF."""
 
@@ -54,11 +54,11 @@ def create(
 @LDIF.constructor
 def modify(
         name: str,
-        new_name: Optional[str] = None,
-        gid: Optional[int] = None,
+        new_name: str | None = None,
+        gid: int | None = None,
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        ou: str | None = None,
+        domain: str | None = None
 ) -> Iterator[LDIFEntry]:
     """Modifies an existing group."""
 
@@ -81,8 +81,8 @@ def add(
         name: str,
         member: str,
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        ou: str | None = None,
+        domain: str | None = None
 ) -> Iterator[LDIFEntry]:
     """Adds a member to the group."""
 
@@ -99,8 +99,8 @@ def remove(
         name: str,
         member: str,
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        ou: str | None = None,
+        domain: str | None = None
 ) -> Iterator[LDIFEntry]:
     """Removes a member from the group."""
 
@@ -115,8 +115,8 @@ def remove(
 def delete(
         name: str,
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        ou: str | None = None,
+        domain: str | None = None
 ) -> DistinguishedName:
     """Removes a member from the group."""
 

@@ -1,6 +1,6 @@
 """User and group management."""
 
-from typing import Iterator, Optional
+from typing import Iterator
 
 from ldaptools.config import CONFIG
 from ldaptools.functions import classes, get_uid, get_gid, get_pwhash
@@ -10,7 +10,7 @@ from ldaptools.ldif import DistinguishedName, LDIF, LDIFEntry
 __all__ = ['create', 'modify', 'delete']
 
 
-def get_cn(first_name: str, last_name: str) -> Optional[str]:
+def get_cn(first_name: str, last_name: str) -> str | None:
     """Returns the respective common name."""
 
     if first_name is None and last_name is None:
@@ -28,14 +28,14 @@ def create(
         first_name: str,
         last_name: str,
         *,
-        passwd: Optional[str] = None,
-        pwhash: Optional[str] = None,
-        uid: Optional[int] = None,
-        gid: Optional[int] = None,
-        home: Optional[str] = None,
-        shell: Optional[str] = None,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        passwd: str | None = None,
+        pwhash: str | None = None,
+        uid: int | None = None,
+        gid: int | None = None,
+        home: str | None = None,
+        shell: str | None = None,
+        ou: str | None = None,
+        domain: str | None = None
 ) -> Iterator[LDIFEntry]:
     """Creates an LDIF representing a new user."""
 
@@ -71,17 +71,17 @@ def create(
 def modify(
         name: str,
         *,
-        new_name: Optional[str] = None,
-        uid: Optional[int] = None,
-        gid: Optional[int] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        passwd: Optional[str] = None,
-        pwhash: Optional[str] = None,
-        home: Optional[str] = None,
-        shell: Optional[str] = None,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        new_name: str | None = None,
+        uid: int | None = None,
+        gid: int | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        passwd: str | None = None,
+        pwhash: str | None = None,
+        home: str | None = None,
+        shell: str | None = None,
+        ou: str | None = None,
+        domain: str | None = None
 ) -> Iterator[LDIFEntry]:
     """Creates an LDIF to modify a user."""
 
@@ -140,8 +140,8 @@ def modify(
 def delete(
         name: str,
         *,
-        ou: Optional[str] = None,
-        domain: Optional[str] = None
+        ou: str | None = None,
+        domain: str | None = None
 ) -> DistinguishedName:
     """Creates an LDIF to delete a user."""
 

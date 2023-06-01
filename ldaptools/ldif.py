@@ -3,7 +3,7 @@
 from __future__ import annotations
 from functools import partial, wraps
 from os import linesep
-from typing import Any, Callable, Iterator, NamedTuple, Optional
+from typing import Any, Callable, Iterator, NamedTuple
 
 from ldaptools.config import CONFIG
 
@@ -30,7 +30,7 @@ class DistinguishedName(list):
             uid: str,
             domain: str,
             *,
-            ou: Optional[str] = None
+            ou: str | None = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a user."""
         return cls([
@@ -45,7 +45,7 @@ class DistinguishedName(list):
             cn: str,
             domain: str,
             *,
-            ou: Optional[str] = None
+            ou: str | None = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a group."""
         return cls([
@@ -59,7 +59,7 @@ class DistinguishedName(list):
             cls,
             domain: str,
             *,
-            cn: Optional[str] = None
+            cn: str | None = None
     ) -> DistinguishedName:
         """Creates a distinguished name for administrative operations."""
         return cls([

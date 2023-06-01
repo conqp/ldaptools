@@ -7,7 +7,6 @@ from secrets import choice
 from string import ascii_letters, digits
 from subprocess import CompletedProcess, check_output, run
 from tempfile import NamedTemporaryFile
-from typing import Optional
 
 from ldaptools.config import CONFIG
 from ldaptools.exceptions import IdentifiersExhausted
@@ -32,7 +31,7 @@ LDAPMODIFY = '/usr/bin/ldapmodify'
 LDAPDELETE = '/usr/bin/ldapdelete'
 
 
-def classes(string: Optional[str], *, sep: str = ',') -> set[str]:
+def classes(string: str | None, *, sep: str = ',') -> set[str]:
     """Returns a set of stripped class names."""
 
     if string is None:
@@ -128,25 +127,7 @@ def genpw(*, pool: str = ascii_letters+digits, length: int = 8) -> str:
     return ''.join(choice(pool) for _ in range(length))
 
 
-def get_uid(*, pool: Optional[range] = None) -> int:
-    """Returns a unique, unassigned user ID."""
-
-    if pool is None:
-        pool = range(
-            CONFIG.getint('user', 'min_uid', fallback=2000),
-            CONFIG.getint('user', 'max_uid', fallback=65545)
-        )
-
-    uids = frozenset(user.pw_uid for user in getpwall())
-
-    for uid in pool:
-        if uid not in uids:
-            return uid
-
-    raise IdentifiersExhausted('UIDs exhausted.')
-
-
-def get_gid(*, pool: Optional[range] = None) -> int:
+def get_gid(*, pool: range | None = None) -> int:
     """Returns a unique, unassigned group ID."""
 
     if pool is None:
@@ -164,10 +145,28 @@ def get_gid(*, pool: Optional[range] = None) -> int:
     raise IdentifiersExhausted('GIDs exhausted.')
 
 
+def get_uid(*, pool: range | None = None) -> int:
+    """Returns a unique, unassigned user ID."""
+
+    if pool is None:
+        pool = range(
+            CONFIG.getint('user', 'min_uid', fallback=2000),
+            CONFIG.getint('user', 'max_uid', fallback=65545)
+        )
+
+    uids = frozenset(user.pw_uid for user in getpwall())
+
+    for uid in pool:
+        if uid not in uids:
+            return uid
+
+    raise IdentifiersExhausted('UIDs exhausted.')
+
+
 def get_pwhash(
         *,
-        passwd: Optional[str] = None,
-        pwhash: Optional[str] = None
+        passwd: str | None = None,
+        pwhash: str | None = None
 ) -> str:
     """Returns the respective password hash."""
 
