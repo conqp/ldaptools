@@ -40,7 +40,8 @@ def create(
     """Creates an LDIF representing a new user."""
 
     yield LDIFEntry(
-        'dn', DistinguishedName.for_user(
+        'dn',
+        DistinguishedName.for_user(
             name,
             CONFIG.get('common', 'domain') if domain is None else domain,
             ou=CONFIG.get('user', 'ou') if ou is None else ou
