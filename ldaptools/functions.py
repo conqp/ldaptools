@@ -27,10 +27,10 @@ __all__ = [
 
 ID_MIN: int = 2000
 ID_MAX: int = 65545
-SLAPPASSWD = '/usr/bin/slappasswd'
-LDAPADD = '/usr/bin/ldapadd'
-LDAPMODIFY = '/usr/bin/ldapmodify'
-LDAPDELETE = '/usr/bin/ldapdelete'
+SLAPPASSWD: str = '/usr/bin/slappasswd'
+LDAPADD: str = '/usr/bin/ldapadd'
+LDAPMODIFY: str = '/usr/bin/ldapmodify'
+LDAPDELETE: str = '/usr/bin/ldapdelete'
 
 
 def classes(string: str | None, *, sep: str = ',') -> set[str]:
