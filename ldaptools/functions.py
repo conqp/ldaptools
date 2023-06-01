@@ -25,6 +25,8 @@ __all__ = [
     'get_pwhash'
 ]
 
+ID_MIN: int = 2000
+ID_MAX: int = 65545
 SLAPPASSWD = '/usr/bin/slappasswd'
 LDAPADD = '/usr/bin/ldapadd'
 LDAPMODIFY = '/usr/bin/ldapmodify'
@@ -132,8 +134,8 @@ def get_gid(*, pool: range | None = None) -> int:
 
     return _get_unique_identifier(
         range(
-            CONFIG.getint('group', 'min_gid', fallback=2000),
-            CONFIG.getint('group', 'max_gid', fallback=65545)
+            CONFIG.getint('group', 'min_gid', fallback=ID_MIN),
+            CONFIG.getint('group', 'max_gid', fallback=ID_MAX)
         ) if pool is None else pool,
         set(group.gr_gid for group in getgrall()),
         'GID'
@@ -145,8 +147,8 @@ def get_uid(*, pool: range | None = None) -> int:
 
     return _get_unique_identifier(
         range(
-            CONFIG.getint('user', 'min_uid', fallback=2000),
-            CONFIG.getint('user', 'max_uid', fallback=65545)
+            CONFIG.getint('user', 'min_uid', fallback=ID_MIN),
+            CONFIG.getint('user', 'max_uid', fallback=ID_MAX)
         ) if pool is None else pool,
         set(user.pw_uid for user in getpwall()),
         'UID'
