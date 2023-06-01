@@ -22,5 +22,5 @@ setup(
     description='LDAP library with user and group management tools.',
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
-    keywords='ldap python bundings tools'
+    keywords='ldap python bindings tools'
 )
