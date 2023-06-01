@@ -98,14 +98,16 @@ class LDIF(list):
         return linesep.join(str(entry) for entry in self)
 
     @classmethod
-    def constructor(cls, function: Callable[..., Iterator[LDIFEntry]]):
+    def constructor(
+            cls,
+            function: Callable[..., Iterator[LDIFEntry]]
+    ) -> Callable[..., LDIF]:
         """Decorator to create an LDIF instance
         from the return values of a function.
         """
         @wraps(function)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> cls:
             """Wraps the original function."""
             return cls(function(*args, **kwargs))
 
-        function.__annotations__['return'] = cls
         return wrapper
