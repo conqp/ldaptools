@@ -8,13 +8,13 @@ from typing import Any, Callable, Iterator, NamedTuple
 from ldaptools.config import CONFIG
 
 
-__all__ = ['DistinguishedName', 'DNComponent', 'LDIFEntry', 'LDIF']
+__all__ = ["DistinguishedName", "DNComponent", "LDIFEntry", "LDIF"]
 
 
 def domain_components(domain: str) -> Iterator[DNComponent]:
     """Yields domain components."""
 
-    return map(partial(DNComponent, 'dc'), filter(None, domain.split('.')))
+    return map(partial(DNComponent, "dc"), filter(None, domain.split(".")))
 
 
 class DistinguishedName(list):
@@ -22,53 +22,43 @@ class DistinguishedName(list):
 
     def __str__(self):
         """Returns a string representation of the distinguished name."""
-        return ','.join(str(component) for component in self)
+        return ",".join(str(component) for component in self)
 
     @classmethod
     def for_user(
-            cls,
-            uid: str,
-            domain: str,
-            *,
-            ou: str | None = None
+        cls, uid: str, domain: str, *, ou: str | None = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a user."""
-        return cls([
-            DNComponent('uid', uid),
-            DNComponent('ou', CONFIG.get('user', 'ou') if ou is None else ou),
-            *domain_components(domain)
-        ])
+        return cls(
+            [
+                DNComponent("uid", uid),
+                DNComponent("ou", CONFIG.get("user", "ou") if ou is None else ou),
+                *domain_components(domain),
+            ]
+        )
 
     @classmethod
     def for_group(
-            cls,
-            cn: str,
-            domain: str,
-            *,
-            ou: str | None = None
+        cls, cn: str, domain: str, *, ou: str | None = None
     ) -> DistinguishedName:
         """Creates a distinguished name for a group."""
-        return cls([
-            DNComponent('cn', cn),
-            DNComponent('ou', CONFIG.get('group', 'ou') if ou is None else ou),
-            *domain_components(domain)
-        ])
+        return cls(
+            [
+                DNComponent("cn", cn),
+                DNComponent("ou", CONFIG.get("group", "ou") if ou is None else ou),
+                *domain_components(domain),
+            ]
+        )
 
     @classmethod
-    def for_master(
-            cls,
-            domain: str,
-            *,
-            cn: str | None = None
-    ) -> DistinguishedName:
+    def for_master(cls, domain: str, *, cn: str | None = None) -> DistinguishedName:
         """Creates a distinguished name for administrative operations."""
-        return cls([
-            DNComponent(
-                'cn',
-                CONFIG.get('common', 'master') if cn is None else cn
-            ),
-            *domain_components(domain)
-        ])
+        return cls(
+            [
+                DNComponent("cn", CONFIG.get("common", "master") if cn is None else cn),
+                *domain_components(domain),
+            ]
+        )
 
 
 class DNComponent(NamedTuple):
@@ -78,7 +68,7 @@ class DNComponent(NamedTuple):
     value: str
 
     def __str__(self):
-        return f'{self.key}={self.value}'
+        return f"{self.key}={self.value}"
 
 
 class LDIFEntry(NamedTuple):
@@ -88,7 +78,7 @@ class LDIFEntry(NamedTuple):
     value: Any
 
     def __str__(self):
-        return f'{self.key}: {self.value}'
+        return f"{self.key}: {self.value}"
 
 
 class LDIF(list):
@@ -99,12 +89,12 @@ class LDIF(list):
 
     @classmethod
     def constructor(
-            cls,
-            function: Callable[..., Iterator[LDIFEntry]]
+        cls, function: Callable[..., Iterator[LDIFEntry]]
     ) -> Callable[..., LDIF]:
         """Decorator to create an LDIF instance
         from the return values of a function.
         """
+
         @wraps(function)
         def wrapper(*args, **kwargs) -> cls:
             """Wraps the original function."""

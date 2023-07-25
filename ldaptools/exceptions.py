@@ -1,6 +1,6 @@
 """Common exceptions."""
 
-__all__ = ['InvalidName', 'IdentifiersExhausted']
+__all__ = ["InvalidName", "IdentifiersExhausted"]
 
 
 class InvalidName(ValueError):
