@@ -1,6 +1,7 @@
 """LDAP group CLI."""
 
 from argparse import ArgumentParser, Namespace, _SubParsersAction
+from subprocess import CalledProcessError
 from logging import INFO, basicConfig
 
 from ldaptools.config import CONFIG, CONFIG_FILE
@@ -67,61 +68,93 @@ def get_args() -> Namespace:
     return parser.parse_args()
 
 
-def _add(args: Namespace) -> None:
+def _add(args: Namespace) -> int:
     """Adds an LDAP group."""
 
     ou = args.ou or CONFIG.get("group", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
     ldif = create(args.group, args.gid, args.member, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
-    ldapadd(master, ldif)
+
+    try:
+        ldapadd(master, ldif)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def _modify(args: Namespace) -> None:
+def _modify(args: Namespace) -> int:
     """Modifies an LDAP group."""
 
     ou = args.ou or CONFIG.get("group", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
     ldif = modify(args.group, gid=args.gid, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
-    ldapmodify(master, ldif)
+
+    try:
+        ldapmodify(master, ldif)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def _add_member(args: Namespace) -> None:
+def _add_member(args: Namespace) -> int:
     """Adds a member to an LDAP group."""
 
     ou = args.ou or CONFIG.get("group", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
+    return_code = 0
 
     for member in args.member:
-        ldif = add(args.group, member, ou=ou, domain=domain)
-        master = DistinguishedName.for_master(domain)
-        ldapmodify(master, ldif)
+        try:
+            ldif = add(args.group, member, ou=ou, domain=domain)
+            master = DistinguishedName.for_master(domain)
+            ldapmodify(master, ldif)
+        except CalledProcessError as error:
+            LOGGER.error("Could not add member: %s", member)
+            return_code = error.returncode
+
+    return return_code
 
 
-def _remove_member(args: Namespace) -> None:
+def _remove_member(args: Namespace) -> int:
     """Removes a member from an LDAP group."""
 
     ou = args.ou or CONFIG.get("group", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
+    return_code = 0
 
     for member in args.member:
-        ldif = remove(args.group, member, ou=ou, domain=domain)
-        master = DistinguishedName.for_master(domain)
-        ldapmodify(master, ldif)
+        try:
+            ldif = remove(args.group, member, ou=ou, domain=domain)
+            master = DistinguishedName.for_master(domain)
+            ldapmodify(master, ldif)
+        except CalledProcessError as error:
+            LOGGER.error("Could not add member: %s", member)
+            return_code = error.returncode
+
+    return return_code
 
 
-def _delete(args: Namespace) -> None:
+def _delete(args: Namespace) -> int:
     """Deletes the respective user."""
 
     ou = args.ou or CONFIG.get("group", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
     dn = delete(args.group, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
-    ldapdelete(master, dn)
+
+    try:
+        ldapdelete(master, dn)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def main() -> None:
+def main() -> int:
     """Main function."""
 
     args = get_args()
@@ -129,14 +162,19 @@ def main() -> None:
     CONFIG.read(CONFIG_FILE)
 
     if args.action == "add":
-        _add(args)
-    elif args.action == "modify":
-        _modify(args)
-    elif args.action == "add-member":
-        _add_member(args)
-    elif args.action == "remove-member":
-        _remove_member(args)
-    elif args.action == "delete":
-        _delete(args)
-    else:
-        LOGGER.error("No action specified.")
+        return _add(args)
+
+    if args.action == "modify":
+        return _modify(args)
+
+    if args.action == "add-member":
+        return _add_member(args)
+
+    if args.action == "remove-member":
+        return _remove_member(args)
+
+    if args.action == "delete":
+        return _delete(args)
+
+    LOGGER.error("No action specified.")
+    return 3

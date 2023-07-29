@@ -1,6 +1,7 @@
 """LDAP user CLI."""
 
 from argparse import ArgumentParser, Namespace, _SubParsersAction
+from subprocess import CalledProcessError
 from logging import INFO, basicConfig
 
 from ldaptools.config import CONFIG, CONFIG_FILE
@@ -56,7 +57,7 @@ def get_args() -> Namespace:
     return parser.parse_args()
 
 
-def _add(args: Namespace) -> None:
+def _add(args: Namespace) -> int:
     """Adds an LDAP user."""
 
     shell = args.shell or CONFIG.get("user", "shell")
@@ -70,54 +71,81 @@ def _add(args: Namespace) -> None:
         passwd = genpw()
         LOGGER.info("Generated password: %s", passwd)
 
-    ldif = create(
-        args.user_name,
-        args.first_name,
-        args.last_name,
-        passwd=passwd,
-        uid=args.uid,
-        gid=args.gid,
-        home=home,
-        shell=shell,
-        ou=ou,
-        domain=domain,
-    )
+    try:
+        ldif = create(
+            args.user_name,
+            args.first_name,
+            args.last_name,
+            passwd=passwd,
+            uid=args.uid,
+            gid=args.gid,
+            home=home,
+            shell=shell,
+            ou=ou,
+            domain=domain,
+        )
+    except CalledProcessError as error:
+        return error.returncode
+
     master = DistinguishedName.for_master(domain)
-    ldapadd(master, ldif)
+
+    try:
+        ldapadd(master, ldif)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def _modify(args: Namespace) -> None:
+def _modify(args: Namespace) -> int:
     """Modifies an LDAP user."""
 
     ou = args.ou or CONFIG.get("user", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
-    ldif = modify(
-        args.user_name,
-        first_name=args.first_name,
-        last_name=args.last_name,
-        passwd=args.passwd,
-        uid=args.uid,
-        gid=args.gid,
-        home=args.home,
-        shell=args.shell,
-        ou=ou,
-        domain=domain,
-    )
+
+    try:
+        ldif = modify(
+            args.user_name,
+            first_name=args.first_name,
+            last_name=args.last_name,
+            passwd=args.passwd,
+            uid=args.uid,
+            gid=args.gid,
+            home=args.home,
+            shell=args.shell,
+            ou=ou,
+            domain=domain,
+        )
+    except CalledProcessError as error:
+        return error.returncode
+
     master = DistinguishedName.for_master(domain)
-    ldapmodify(master, ldif)
+
+    try:
+        ldapmodify(master, ldif)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def _delete(args: Namespace) -> None:
+def _delete(args: Namespace) -> int:
     """Deletes the respective user."""
 
     ou = args.ou or CONFIG.get("user", "ou")
     domain = args.domain or CONFIG.get("common", "domain")
     dn = delete(args.user_name, ou=ou, domain=domain)
     master = DistinguishedName.for_master(domain)
-    ldapdelete(master, dn)
+
+    try:
+        ldapdelete(master, dn)
+    except CalledProcessError as error:
+        return error.returncode
+
+    return 0
 
 
-def main() -> None:
+def main() -> int:
     """Main function."""
 
     args = get_args()
@@ -125,10 +153,13 @@ def main() -> None:
     CONFIG.read(CONFIG_FILE)
 
     if args.action == "add":
-        _add(args)
-    elif args.action == "modify":
-        _modify(args)
-    elif args.action == "delete":
-        _delete(args)
-    else:
-        LOGGER.error("No action specified.")
+        return _add(args)
+
+    if args.action == "modify":
+        return _modify(args)
+
+    if args.action == "delete":
+        return _delete(args)
+
+    LOGGER.error("No action specified.")
+    return 3
